@@ -1,0 +1,14 @@
+{
+  "codeowners": ["@filipek92"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/filipek92/iqr23",
+  "domain": "iqr23",
+  "iot_class": "local_polling",
+  "name": "iQ R23",
+  "requirements": [
+    "xmltodict==0.13.0",
+    "requests==2.25.1"
+  ],
+  "version": "1.0.0"
+}
