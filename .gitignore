@@ -42,8 +42,6 @@ home-assistant.log
 home-assistant.log.*
 ozw_log.txt
 
-# Development files
-custom_components
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
