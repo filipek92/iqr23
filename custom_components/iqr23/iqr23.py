@@ -208,28 +208,57 @@ class IQR23:
         res.raise_for_status()
 
     def setDigitalOutputMode(self, output, value):
-        btn = DIGITAL_OUTPUTS[output].control_set[value]
+        try:
+            output = DIGITAL_OUTPUTS[output]
+        except KeyError: 
+            raise KeyError("Output not found")
+        try:
+            btn = output.control_set[value]
+        except KeyError:
+            raise KeyError("Value not found")
         self.login(AccessLevel.MASTER)
         self._pressBtn(btn)
         self.logout()
     
     def getDigitalOutputMode(self, output):
         self.loadIfRequired()
-        setup = DIGITAL_OUTPUTS[output].control_get
+        try:
+            output = DIGITAL_OUTPUTS[output]
+        except KeyError: 
+            raise KeyError("Output not found")
+        setup = output.control_get
         for k, v in setup.items():
             if(self.state.get(k) == '1'):
                 return v
+        else:
+            raise KeyError("Value not found")
         return None
 
     def getDigitalOutputState(self, output):
         self.loadIfRequired()
-        field = DIGITAL_OUTPUTS[output].status
-        return self.state.get(field) == '1'
+        try:
+            output = DIGITAL_OUTPUTS[output]
+        except KeyError: 
+            raise KeyError("Output not found")
+
+        try:
+            value = self.state.get(output.status)
+        except:
+            raise KeyError("Value not found")
+        return value == '1'
     
     def getSensor(self, name):
         self.loadIfRequired()
-        sensor = SENSORS[name]
-        return sensor.parse(self.state.get(sensor.name))
+        try:
+            sensor = SENSORS[name]
+        except KeyError: 
+            raise KeyError("Sensor not found")
+
+        try:
+            value = self.state[sensor.name]
+        except KeyError:
+            raise KeyError("Value not found")
+        return sensor.parse(value)
 
     def __repr__(self):
         return f"<IQR23({self.url}, {self.loadtime})>"
