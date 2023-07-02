@@ -1,11 +1,24 @@
 import requests
+import aiohttp
+import asyncio
 import xmltodict
 from enum import Enum
 from collections import namedtuple
 from time import time
-from utils import sptime, parseTemperature
 from datetime import datetime, timedelta
 
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
+def sptime(value):
+    h, m = map(int, value.split()[1].split(":"))
+    return round(h+m/60, 2)
+
+def parseTemperature(value: str):
+    if value == '--.-':
+        return float('NaN')
+    return float(value)
 
 class AccessLevel(Enum):
     LOGOUT = ""
@@ -101,8 +114,8 @@ DIGITAL_OUTPUTS = {
 }
 
 SENSORS = {
-    "outdoorTemp": Sensor(type=float, name="txt113", unit="°C", convertor=parseTemperature, info="T13 teplota venkovního čidla", friendly_name="Venkovní teplota - Garáž"),
-    "outdoorTempMin": Sensor(type=float, name="txt714", unit="°C", convertor=parseTemperature, info="Minimální teplota za posledních 24 hodin"),
+    "outdoorTemp": Sensor(type=float, name="txt113", unit="°C", convertor=parseTemperature, info="T13 teplota venkovního čidla", friendly_name="Outdoor teperature"),
+    "outdoorTempMin": Sensor(type=float, name="txt714", unit="°C", convertor=parseTemperature, info="Minimální teplota za posledních 24 hodin", friendly_name="Minimal day temep"),
     "outdoorTempMax": Sensor(type=float, name="txt715", unit="°C", convertor=parseTemperature, info="Maximální teplota za posledních 24 hodin"),
     "outdoorTempMean": Sensor(type=float, name="txt713", unit="°C", convertor=parseTemperature, info="Průměrná teplota za posledních 24 hodin"),
 
@@ -134,17 +147,17 @@ SENSORS = {
     "fireplace": Sensor(type=float, name="txt104", unit="°C", convertor=parseTemperature, info="T04 teplota čidla krbu", friendly_name="Krbová vložka"),
     "fireplaceCirculation": Sensor(type=bool, name="_ico104", info="Stav oběhového čerpadla krbového okruhu", convertor=lambda x: x=="3", friendly_name="Oběh krbových kamen"),
 
-    "solarTemperature": Sensor(type=float, name="txt105", unit="°C", convertor=parseTemperature, info="T05 teplota čidla solárních panelů"),
-    "solarCirculation": Sensor(type=bool, name="col291", info="Stav oběhového čerpadla solárních panelů", convertor=lambda x: x=="1"),
+    "solarTemperature": Sensor(type=float, name="txt105", unit="°C", convertor=parseTemperature, info="T05 teplota čidla solárních panelů", homeassistant_icon="mdi:sun-thermometer"),
+    "solarCirculation": Sensor(type=bool, name="col291", info="Stav oběhového čerpadla solárních panelů", convertor=lambda x: x=="1", homeassistant_class="running", homeassistant_icon="mdi:sun-wireless"),
 
-    "SP1Power": Sensor(type=float, name="txt590", unit='kW', info="Výkon patrony SP1", friendly_name="Výkon patrony SP1"),
-    "SP2Power": Sensor(type=float, name="txt591", unit='kW', info="Výkon patrony SP2", friendly_name="Výkon patrony SP2"),
+    #"SP1Power": Sensor(type=float, name="txt590", unit='kW', info="Výkon patrony SP1", friendly_name="Výkon patrony SP1"),
+    #"SP2Power": Sensor(type=float, name="txt591", unit='kW', info="Výkon patrony SP2", friendly_name="Výkon patrony SP2"),
 
     "lowTariff": Sensor(type=bool, name="col203", info="Stav vstupu NT nízkého tarifu HDO", convertor=lambda x: x=="1", friendly_name="Nízký tarif"),
-    "waterCirculation": Sensor(type=bool, name="col106", info="Stav oběhového čerpadla cirkulace TUV ", convertor=lambda x: x=="1"),
+    "waterCirculation": Sensor(type=bool, name="col106", info="Stav oběhového čerpadla cirkulace TUV ", convertor=lambda x: x=="1", homeassistant_class="running"),
     "UPS": Sensor(type=bool, name="col211", info="Vstup záložního zdroje", convertor=lambda x: x=="1", friendly_name="Záložní zdroj"),
 
-    "datetime": Sensor(type=datetime, name="_acctime", info="Aktuální datum a čas", convertor=lambda x: datetime.strptime(x[3:], "%d.%m.%Y  %H:%M:%S")),
+    #"datetime": Sensor(type=datetime, name="_acctime", info="Aktuální datum a čas", convertor=lambda x: datetime.strptime(x[3:], "%d.%m.%Y  %H:%M:%S"), homeassistant_class="date"),
 }
 
 DEFAULT_PASSWORD = {
@@ -153,30 +166,35 @@ DEFAULT_PASSWORD = {
     AccessLevel.MASTER: "Servis254"
 }
 
+async def getXml(url: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            responseXML = xmltodict.parse(await response.text())["response"]
+            return responseXML
+
 class IQR23:
-    def __init__(self, url: str, user_pass=None, master_pass=None):
-        self.url = url if url.startswith('http') else 'http://'+url
+    async def discovery(host: str):
+        if not host.startswith('http'):
+            host =  'http://'+host
+
+        return (await getXml(f'{host}/data.xml'))["_accvers"]
+
+    def __init__(self, host: str, user_pass=None, master_pass=None):
+        self.host = host if host.startswith('http') else 'http://'+host
         self.password = {
             AccessLevel.LOGOUT: DEFAULT_PASSWORD[AccessLevel.LOGOUT],
             AccessLevel.USER: user_pass if user_pass else DEFAULT_PASSWORD[AccessLevel.USER],
             AccessLevel.MASTER: master_pass if master_pass else DEFAULT_PASSWORD[AccessLevel.MASTER]
         }
-        self.verbose = False
         self.state = dict()
         self.loadtime = 0
+        self._sequential_lock = asyncio.Lock()
 
-    def loadFile(self, file):
-        url = f"{self.url}/{file}.xml"
-        if self.verbose: 
-            print("loading:", url)
-        response = requests.get(url)
-        file_data = xmltodict.parse(response.content)["response"]
-        if self.verbose:
-            print(response.content)
-            pprint.pprint(file_data)
-        return file_data
+    async def loadFile(self, file):
+        return await getXml(f"{self.host}/{file}.xml")
     
-    def load(self):
+    async def load(self):
+        _LOGGER.warning(f"Loading....")
         files = (
             'data',
             'data_i_all',
@@ -187,27 +205,34 @@ class IQR23:
 
         self.state = dict()
         for file in files:
-            file_data = self.loadFile(file)
+            file_data = await self.loadFile(file)
             self.state.update(file_data)
-        self.loadtime = time()
 
-    def loadIfRequired(self):
-        if self.loadtime + 30 < time():
-            self.load() 
 
-    def login(self, level=AccessLevel.LOGOUT):
-        requests.post(f'{self.url}/login.html', data={"pass": self.password[level]})
+    async def loadIfRequired(self):
+        now = time()
+        async with self._sequential_lock:
+            if self.loadtime + 30 < now:
+                await self.load() 
+                self.loadtime = now
+
+
+    async def login(self, level=AccessLevel.LOGOUT):
+        async with self._sequential_lock:
+            async with aiohttp.ClientSession() as session:
+                return await session.post(f'{self.host}/login.html', data={"pass": self.password[level]})
     
-    def logout(self, save=False):
+    async def logout(self, save=False):
         if save:
-            self._pressBtn(Buttons.SAVE)
-        self.login(AccessLevel.LOGOUT)
+            await self._pressBtn(Buttons.SAVE)
+        await self.login(AccessLevel.LOGOUT)
 
-    def _pressBtn(self, button: int):
-        res = requests.get(f'{self.url}/t_but.cgi?but={button}')
-        res.raise_for_status()
+    async def _pressBtn(self, button: int):
+        async with self._sequential_lock:
+            async with aiohttp.ClientSession() as session:
+                return await session.get(f'{self.host}/t_but.cgi?but={button}')
 
-    def setDigitalOutputMode(self, output, value):
+    async def setDigitalOutputMode(self, output, value):
         try:
             output = DIGITAL_OUTPUTS[output]
         except KeyError: 
@@ -216,12 +241,13 @@ class IQR23:
             btn = output.control_set[value]
         except KeyError:
             raise KeyError("Value not found")
-        self.login(AccessLevel.MASTER)
-        self._pressBtn(btn)
-        self.logout()
+        await self.login(AccessLevel.MASTER)
+        await self._pressBtn(btn)
+        await self.logout()
+        await self.load()
     
-    def getDigitalOutputMode(self, output):
-        self.loadIfRequired()
+    async def getDigitalOutputMode(self, output):
+        await self.loadIfRequired()
         try:
             output = DIGITAL_OUTPUTS[output]
         except KeyError: 
@@ -234,8 +260,8 @@ class IQR23:
             raise KeyError("Value not found")
         return None
 
-    def getDigitalOutputState(self, output):
-        self.loadIfRequired()
+    async def getDigitalOutputState(self, output):
+        await self.loadIfRequired()
         try:
             output = DIGITAL_OUTPUTS[output]
         except KeyError: 
@@ -247,8 +273,8 @@ class IQR23:
             raise KeyError("Value not found")
         return value == '1'
     
-    def getSensor(self, name):
-        self.loadIfRequired()
+    async def getSensor(self, name):
+        await self.loadIfRequired()
         try:
             sensor = SENSORS[name]
         except KeyError: 
@@ -261,4 +287,10 @@ class IQR23:
         return sensor.parse(value)
 
     def __repr__(self):
-        return f"<IQR23({self.url}, {self.loadtime})>"
+        return f"<IQR23({self.host}, {self.loadtime})>"
+
+
+def run_async(coroutine):
+    import asyncio
+    loop = asyncio.new_event_loop()
+    loop.run_until_complete(coroutine)

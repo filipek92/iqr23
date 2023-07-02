@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "IQ R23 Regulace topení",
+        "data": {
+          "host": "Server nebo IP adresa",
+          "username": "Uživatelské jméno",
+          "password": "Heslo"
+        }
+      }
+    },
+    "error": {
+      "multiple_hosts": "Očekávána odpověď od právě jednoho ovladače, obdržena odpověď od více.",
+      "cannot_connect": "Nelze se připojit k řídicí jednotce.",
+      "invalid_auth": "Neplatné uživatelské jméno nebo heslo.",
+      "unknown": "Neznámá chyba."
+    },
+    "abort": {
+      "already_configured": "Tento ovladač je již nakonfigurován."
+    }
+  }
+}

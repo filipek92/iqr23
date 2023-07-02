@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "iQ R23 Heating controller",
+        "data": {
+          "host": "Host or IP",
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "multiple_hosts": "Reply from exactly one host required, got mutliple.",
+      "cannot_connect": "Cannot connect to the host.",
+      "invalid_auth": "Authentication failure.",
+      "unknown": "Unknown error."
+    },
+    "abort": {
+      "already_configured": "Already configured for this host."
+    }
+  }
+}
