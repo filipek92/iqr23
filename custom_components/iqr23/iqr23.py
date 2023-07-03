@@ -212,7 +212,7 @@ class IQR23:
     async def loadIfRequired(self):
         now = time()
         async with self._sequential_lock:
-            if self.loadtime + 30 < now:
+            if self.loadtime + 5 < now:
                 await self.load() 
                 self.loadtime = now
 
