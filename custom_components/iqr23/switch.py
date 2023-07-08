@@ -60,12 +60,14 @@ class IQR23Switch(SwitchEntity):
         """Instruct the light to turn on."""
         _LOGGER.warning(f"Tunrning on {self._uid}, {kwargs}")
         await self._api.setDigitalOutputMode(self._uid, "on")
+        self._attr_is_on = True
 
 
     async def async_turn_off(self, **kwargs):
         """Instruct the light to turn off."""
         _LOGGER.warning(f"Tunrning off {self._uid}, {kwargs}")
         await self._api.setDigitalOutputMode(self._uid, "off")
+        self._attr_is_on = False
 
     # @property
     # def device_class(self):
