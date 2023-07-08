@@ -148,7 +148,7 @@ SENSORS = {
     "fireplaceCirculation": Sensor(type=bool, name="_ico104", info="Stav oběhového čerpadla krbového okruhu", convertor=lambda x: x=="3", friendly_name="Oběh krbových kamen"),
 
     "solarTemperature": Sensor(type=float, name="txt105", unit="°C", convertor=parseTemperature, info="T05 teplota čidla solárních panelů", homeassistant_icon="mdi:sun-thermometer"),
-    "solarCirculation": Sensor(type=bool, name="col291", info="Stav oběhového čerpadla solárních panelů", convertor=lambda x: x=="1", homeassistant_class="running", homeassistant_icon="mdi:sun-wireless"),
+    "solarCirculation": Sensor(type=bool, name="col420", info="Stav oběhového čerpadla solárních panelů", convertor=lambda x: x=="1", homeassistant_class="running", homeassistant_icon="mdi:sun-wireless"),
 
     #"SP1Power": Sensor(type=float, name="txt590", unit='kW', info="Výkon patrony SP1", friendly_name="Výkon patrony SP1"),
     #"SP2Power": Sensor(type=float, name="txt591", unit='kW', info="Výkon patrony SP2", friendly_name="Výkon patrony SP2"),
