@@ -2,11 +2,9 @@
   "config": {
     "step": {
       "user": {
-        "title": "IQ Topneni Control Unit",
+        "title": "iQ R23 Control Unit",
         "data": {
-          "host": "Host or IP",
-          "username": "Username",
-          "password": "Password"
+          "host": "Host or IP address"
         }
       }
     },

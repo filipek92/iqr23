@@ -2,11 +2,9 @@
   "config": {
     "step": {
       "user": {
-        "title": "IQ R23 Regulace topení",
+        "title": "iQ R23 Regulace topení",
         "data": {
-          "host": "Server nebo IP adresa",
-          "username": "Uživatelské jméno",
-          "password": "Heslo"
+          "host": "Server nebo IP adresa"
         }
       }
     },

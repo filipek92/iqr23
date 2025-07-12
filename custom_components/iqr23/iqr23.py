@@ -1,4 +1,3 @@
-import requests
 import aiohttp
 import asyncio
 import xmltodict
@@ -24,6 +23,9 @@ class AccessLevel(Enum):
     LOGOUT = ""
     USER = "user"
     MASTER = "master"
+
+class Buttons:
+    SAVE = 200  # Predefined button number for save action
 
 class HardwareDigitalOutput:
     def __init__(self, name, status, control_set, control_get):
@@ -168,17 +170,33 @@ DEFAULT_PASSWORD = {
 }
 
 async def getXml(url: str):
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            responseXML = xmltodict.parse(await response.text())["response"]
-            return responseXML
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, timeout=aiohttp.ClientTimeout(total=10)) as response:
+                if response.status != 200:
+                    raise aiohttp.ClientError(f"HTTP {response.status}")
+                text = await response.text()
+                responseXML = xmltodict.parse(text)["response"]
+                return responseXML
+    except asyncio.TimeoutError:
+        _LOGGER.error(f"Timeout while fetching {url}")
+        raise
+    except Exception as e:
+        _LOGGER.error(f"Error fetching XML from {url}: {e}")
+        raise
 
 class IQR23:
+    @staticmethod
     async def discovery(host: str):
         if not host.startswith('http'):
             host =  'http://'+host
 
-        return (await getXml(f'{host}/data.xml'))["_accvers"]
+        try:
+            response = await getXml(f'{host}/data.xml')
+            return response["_accvers"]
+        except Exception as e:
+            _LOGGER.error(f"Discovery failed for {host}: {e}")
+            return None
 
     def __init__(self, host: str, user_pass=None, master_pass=None):
         self.host = host if host.startswith('http') else 'http://'+host
@@ -220,8 +238,17 @@ class IQR23:
 
     async def login(self, level=AccessLevel.LOGOUT):
         async with self._sequential_lock:
-            async with aiohttp.ClientSession() as session:
-                return await session.post(f'{self.host}/login.html', data={"pass": self.password[level]})
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(
+                        f'{self.host}/login.html', 
+                        data={"pass": self.password[level]},
+                        timeout=aiohttp.ClientTimeout(total=10)
+                    ) as response:
+                        return response.status == 200
+            except Exception as e:
+                _LOGGER.error(f"Login failed: {e}")
+                return False
     
     async def logout(self, save=False):
         if save:
@@ -230,8 +257,16 @@ class IQR23:
 
     async def _pressBtn(self, button: int):
         async with self._sequential_lock:
-            async with aiohttp.ClientSession() as session:
-                return await session.get(f'{self.host}/t_but.cgi?but={button}')
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(
+                        f'{self.host}/t_but.cgi?but={button}',
+                        timeout=aiohttp.ClientTimeout(total=10)
+                    ) as response:
+                        return response.status == 200
+            except Exception as e:
+                _LOGGER.error(f"Button press failed: {e}")
+                return False
 
     async def setDigitalOutputMode(self, output, value):
         try:

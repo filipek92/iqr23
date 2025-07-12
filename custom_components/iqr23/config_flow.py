@@ -28,7 +28,7 @@ DATA_SCHEMA = vol.Schema({vol.Required("host"): str})
 
 async def validate_input(hass: core.HomeAssistant, data: dict):
     """
-    Validate the user input by executing a Skydance discovery protocol.
+    Validate the user input by executing an IQR23 discovery protocol.
 
     Data has the keys from DATA_SCHEMA with values provided by the user.
     """
@@ -36,10 +36,10 @@ async def validate_input(hass: core.HomeAssistant, data: dict):
         raise InvalidHost()
     try:
         host = data['host']
-        _LOGGER.info(f"Trying to discovery on {host}")
+        _LOGGER.info(f"Trying to discover on {host}")
         discovery_result = await IQR23.discovery(host)
-    except OSError as e:
-        _LOGGER.exception(e)
+    except Exception as e:
+        _LOGGER.exception(f"Discovery failed for {host}: {e}")
         raise CannotConnect() from e
 
     if not discovery_result:
@@ -67,7 +67,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     "host": host,
                     "version": discovery_result
                 }
-                _LOGGER.info("Adding IQ Topeni config entry with data=%s", data)
+                _LOGGER.info("Adding iQ R23 config entry with data=%s", data)
                 await self.async_set_unique_id(host)
                 self._abort_if_unique_id_configured()
                 return self.async_create_entry(title=host, data=data)

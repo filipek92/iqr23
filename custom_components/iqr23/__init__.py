@@ -5,7 +5,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import DOMAIN, PLATFORMS
+from .const import DOMAIN, PLATFORMS, MANUFACTURER, MODEL
 
 from .iqr23 import IQR23
 
@@ -21,15 +21,25 @@ async def async_setup(hass, config):
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data.setdefault(DOMAIN, {})
 
-    _LOGGER.warning(f"Setup of IQR23 platform {entry.data}")
+    _LOGGER.info(f"Setup of IQR23 platform {entry.data}")
 
     api = IQR23(entry.data["host"])
 
+    # Store version info for device_info
+    device_info = {
+        "identifiers": {(DOMAIN, entry.data["host"])},
+        "name": "iQ R23",
+        "manufacturer": MANUFACTURER,
+        "model": MODEL,
+        "sw_version": entry.data.get("version", "unknown"),
+    }
+
     hass.data[DOMAIN] = {
-        "api": api
+        "api": api,
+        "device_info": device_info,
     }
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
-    _LOGGER.warning(f"Setup of IQR23 platform {entry.data} done")
+    _LOGGER.info(f"Setup of IQR23 platform {entry.data} done")
     return True
 
 
