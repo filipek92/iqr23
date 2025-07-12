@@ -19,24 +19,27 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
     api = hass.data[DOMAIN]["api"]
+    device_info = hass.data[DOMAIN]["device_info"]
 
     new_entities = []
     for uid, sensor_info in SENSORS.items():
         if sensor_info.type != bool:
             continue
-        new_entities.append(IQR23BinarySensor(api, uid, sensor_info))
+        new_entities.append(IQR23BinarySensor(api, uid, sensor_info, device_info))
 
     if new_entities:
         async_add_entities(new_entities, update_before_add=True)
 
 class IQR23BinarySensor(BinarySensorEntity):
 
-    def __init__(self, api: IQR23, uid: str, sensor_info: Sensor):
+    def __init__(self, api: IQR23, uid: str, sensor_info: Sensor, device_info: dict):
         super().__init__()
         self._api = api
         self._uid = uid
         self._sensor_info = sensor_info
+        self._device_info = device_info
         self._attr_available = False
+        self._attr_has_entity_name = True
 
     async def async_update(self) -> None:
         try:
@@ -51,7 +54,7 @@ class IQR23BinarySensor(BinarySensorEntity):
 
     @property
     def name(self):
-        return f"iqr23_{self._uid}"
+        return self._sensor_info.friendly_name or f"iqr23_{self._uid}"
     
     @property
     def friendly_name(self):
@@ -59,15 +62,12 @@ class IQR23BinarySensor(BinarySensorEntity):
 
     @property
     def unique_id(self):
-        return self._uid
+        return f"iqr23_{self._uid}"
 
     @property
     def device_info(self):
         # https://developers.home-assistant.io/docs/device_registry_index/#device-properties
-        return {
-            "identifiers": {(DOMAIN, "")},
-            "name": "iQ R23",
-        }
+        return self._device_info
 
     @property
     def device_class(self):

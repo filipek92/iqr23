@@ -4,14 +4,12 @@
       "user": {
         "title": "iQ R23 Heating controller",
         "data": {
-          "host": "Host or IP",
-          "username": "Username",
-          "password": "Password"
+          "host": "Host or IP address"
         }
       }
     },
     "error": {
-      "multiple_hosts": "Reply from exactly one host required, got mutliple.",
+      "multiple_hosts": "Reply from exactly one host required, got multiple.",
       "cannot_connect": "Cannot connect to the host.",
       "invalid_auth": "Authentication failure.",
       "unknown": "Unknown error."

@@ -14,35 +14,39 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback) -> None:
     api = hass.data[DOMAIN]["api"]
+    device_info = hass.data[DOMAIN]["device_info"]
 
     new_entities = []
 
     for uid, output_info in DIGITAL_OUTPUTS.items():
-        new_entities.append(IQR23Switch(api, uid, output_info))
+        new_entities.append(IQR23Switch(api, uid, output_info, device_info))
 
     if new_entities:
         async_add_entities(new_entities, update_before_add=True)
 
 class IQR23Switch(SwitchEntity):
 
-    def __init__(self, api: IQR23, uid: str, info: HardwareDigitalOutput):
+    def __init__(self, api: IQR23, uid: str, info: HardwareDigitalOutput, device_info: dict):
         super().__init__()
         self._api = api
         self._uid = uid
         self._info = info
+        self._device_info = device_info
         self._attr_available = False
+        self._attr_has_entity_name = True
 
     async def async_update(self) -> None:
         try:
             self._attr_is_on = await self._api.getDigitalOutputState(self._uid)
             #self._attr_extra_state_attributes = res["info"]
             self._attr_available = (await self._api.getDigitalOutputMode(self._uid)) in ["on", "off"]
-        except (asyncio.TimeoutError, aiohttp.ClientError, KeyError):
+        except (asyncio.TimeoutError, aiohttp.ClientError, KeyError) as e:
+            _LOGGER.debug(f"Error updating switch {self._uid}: {e}")
             self._attr_available = False
 
     @property
     def name(self):
-        return f"iqr23_{self._uid}"  # TODO translate?
+        return self._info.name
 
     @property
     def unique_id(self):
@@ -51,10 +55,7 @@ class IQR23Switch(SwitchEntity):
     @property
     def device_info(self):
         # https://developers.home-assistant.io/docs/device_registry_index/#device-properties
-        return {
-            "identifiers": {(DOMAIN, "")},
-            "name": "iQ R23",
-        }
+        return self._device_info
 
     async def async_turn_on(self, **kwargs):
         """Instruct the light to turn on."""
