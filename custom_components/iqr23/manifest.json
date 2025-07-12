@@ -6,12 +6,13 @@
   ],
   "documentation": "https://github.com/filipek92/iqr23",
   "domain": "iqr23",
-  "iot_class": "local_polling",
   "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/filipek92/iqr23/issues",
   "name": "iQ R23",
   "requirements": [
     "xmltodict>=0.13.0",
     "aiohttp>=3.8.0"
   ],
-  "version": "1.1.2"
+  "version": "1.2.1"
 }
