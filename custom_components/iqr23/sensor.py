@@ -65,11 +65,15 @@ class IQR23Sensor(SensorEntity):
     @property
     def device_class(self):
         return self._sensor_info.homeassistant_class
+    
+    @property
+    def state_class(self):
+        return self._sensor_info.homeassistant_sclass
 
     @property
     def icon(self):
         return self._sensor_info.homeassistant_icon
 
     @property
-    def unit_of_measurement(self):
+    def native_unit_of_measurement(self):
         return self._sensor_info.unit

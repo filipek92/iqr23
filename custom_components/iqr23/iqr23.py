@@ -33,7 +33,7 @@ class HardwareDigitalOutput:
         self.control_get = control_get
 
 class Sensor:
-    def __init__(self, name, type, unit="", info="", convertor=None, friendly_name=None, homeassistant_class=None, homeassistant_inversed=False, homeassistant_icon=None, publish_time=0):
+    def __init__(self, name, type, unit="", info="", convertor=None, friendly_name=None, homeassistant_class=None, homeassistant_sclass=None, homeassistant_inversed=False, homeassistant_icon=None, publish_time=0):
         self.name = name
         self.friendly_name = friendly_name
         self.unit = unit
@@ -46,6 +46,7 @@ class Sensor:
         self.homeassistant_class = homeassistant_class
         self.homeassistant_inversed = homeassistant_inversed
         self.homeassistant_icon = homeassistant_icon
+        self.homeassistant_sclass = homeassistant_sclass
         self.last_published = None
 
     def parse(self, value):
@@ -114,40 +115,40 @@ DIGITAL_OUTPUTS = {
 }
 
 SENSORS = {
-    "outdoorTemp": Sensor(type=float, name="txt113", unit="°C", convertor=parseTemperature, info="T13 teplota venkovního čidla", friendly_name="Outdoor teperature"),
-    "outdoorTempMin": Sensor(type=float, name="txt714", unit="°C", convertor=parseTemperature, info="Minimální teplota za posledních 24 hodin", friendly_name="Minimal day temep"),
-    "outdoorTempMax": Sensor(type=float, name="txt715", unit="°C", convertor=parseTemperature, info="Maximální teplota za posledních 24 hodin"),
-    "outdoorTempMean": Sensor(type=float, name="txt713", unit="°C", convertor=parseTemperature, info="Průměrná teplota za posledních 24 hodin"),
+    "outdoorTemp": Sensor(type=float, name="txt113", unit="°C", convertor=parseTemperature, info="T13 teplota venkovního čidla", friendly_name="Outdoor teperature", homeassistant_sclass="measurement", homeassistant_class="temperature"),
+    "outdoorTempMin": Sensor(type=float, name="txt714", unit="°C", convertor=parseTemperature, info="Minimální teplota za posledních 24 hodin", friendly_name="Minimal day temp", homeassistant_class="temperature"),
+    "outdoorTempMax": Sensor(type=float, name="txt715", unit="°C", convertor=parseTemperature, info="Maximální teplota za posledních 24 hodin", homeassistant_class="temperature"),
+    "outdoorTempMean": Sensor(type=float, name="txt713", unit="°C", convertor=parseTemperature, info="Průměrná teplota za posledních 24 hodin", homeassistant_class="temperature"),
 
-    "watertankUpper": Sensor(type=float, name="txt101", unit="°C", convertor=parseTemperature, info="Teplota čidla T01 horní části zásobníku", friendly_name="Zásobník nahoře"),
-    "watertankUpperRequest": Sensor(type=float, name="txt501", unit="°C", convertor=parseTemperature, info="Požadovaná teplota S1 horní části zásobníku"),
+    "watertankUpper": Sensor(type=float, name="txt101", unit="°C", convertor=parseTemperature, info="Teplota čidla T01 horní části zásobníku", friendly_name="Zásobník nahoře", homeassistant_class="temperature"),
+    "watertankUpperRequest": Sensor(type=float, name="txt501", unit="°C", convertor=parseTemperature, info="Požadovaná teplota S1 horní části zásobníku", homeassistant_class="temperature"),
     "watertankUpperHeating": Sensor(type=bool, name="_ico101", info="Topná spirála SP1", convertor=lambda x: x=="1", homeassistant_class="heat", friendly_name="Topení zásobníku nahoře"),
     "watertankUpperHeatingTime": Sensor(type=float, name="txt740", unit="h", info="Čas topení spirály SP1", convertor=sptime, friendly_name="Topení zásobníku nahoře čas", homeassistant_icon="mdi:clock"),
-    "watertankMiddle": Sensor(type=float, name="txt102", unit="°C", convertor=parseTemperature, info="Teplota čidla T02 střední části zásobníku", friendly_name="Zásobník střed"),
-    "watertankLower": Sensor(type=float, name="txt106", unit="°C", convertor=parseTemperature, info="Teplota čidla T06 dolní části zásobníku", friendly_name="Zásobník dole"),
+    "watertankMiddle": Sensor(type=float, name="txt102", unit="°C", convertor=parseTemperature, info="Teplota čidla T02 střední části zásobníku", friendly_name="Zásobník střed", homeassistant_class="temperature"),
+    "watertankLower": Sensor(type=float, name="txt106", unit="°C", convertor=parseTemperature, info="Teplota čidla T06 dolní části zásobníku", friendly_name="Zásobník dole", homeassistant_class="temperature"),
     "watertankLowerRequest": Sensor(type=float, name="txt502", unit="°C", convertor=parseTemperature, info="Požadovaná teplota S2 dolní části zásobníku"),
     "watertankLowerHeating": Sensor(type=bool, name="_ico102", info="Topná spirála SP2", convertor=lambda x: x=="1", homeassistant_class="heat", friendly_name="Topení zásobníku dole"),
     "watertankLowerHeatingTime": Sensor(type=float, name="txt741", unit="h", info="Čas topení spirály SP2", convertor=sptime, friendly_name="Topení zásobníku dole čas", homeassistant_icon="mdi:clock"),
     "watertankPressure": Sensor(type=bool, name="col202", info="Stav vstupu tlakového čidla, True = OK", homeassistant_class="problem", homeassistant_inversed=True, friendly_name="Tlak v systému"),
 
-    "lowerFloor": Sensor(type=float, name="txt111", unit="°C", convertor=parseTemperature, info="T11 teplota čidla na výstupu ekvitermního okruhu TO1", friendly_name="Podlahovka přízemí"),
-    "lowerFloorRequest": Sensor(type=float, name="txt520", unit="°C", convertor=parseTemperature, info="Požadovaná teplota ekvitermního okruhu TO1"),
+    "lowerFloor": Sensor(type=float, name="txt111", unit="°C", convertor=parseTemperature, info="T11 teplota čidla na výstupu ekvitermního okruhu TO1", friendly_name="Podlahovka přízemí", homeassistant_class="temperature"),
+    "lowerFloorRequest": Sensor(type=float, name="txt520", unit="°C", convertor=parseTemperature, info="Požadovaná teplota ekvitermního okruhu TO1", homeassistant_class="temperature"),
     "lowerFloorMixing": Sensor(type=float, name="txt521", unit="%", info="Velikost otevření třícestného směšovacího ventilu okruhu TO1 v procentech", convertor=lambda x: int(x[:-1]), friendly_name="Směšovač přízemí", homeassistant_icon="mdi:call-merge"),
     "lowerFloorLimiting": Sensor(type=bool, name="col115", info="Útlum topného okruhu TO1, True=útlum aktivní", convertor=lambda x: x=="1"),
     "lowerFloorActive": Sensor(type=bool, name="col206", info="Vstup z prostorového termostatu TO1, True=požadavek top", convertor=lambda x: x=="1", friendly_name="Podlahové topení přízemí"),
     "lowerFloorCirculation": Sensor(type=bool, name="_ico107", info="Stav oběhového čerpadla topného okruhu TO1", convertor=lambda x: x=="3"),
 
-    "upperFloor": Sensor(type=float, name="txt112", unit="°C", convertor=parseTemperature, info="T12 teplota čidla na výstupu ekvitermního okruhu TO2", friendly_name="Podlahovka patro"),
-    "upperFloorRequest": Sensor(type=float, name="txt526", unit="°C", convertor=parseTemperature, info="Požadovaná teplota ekvitermního okruhu TO2"),
+    "upperFloor": Sensor(type=float, name="txt112", unit="°C", convertor=parseTemperature, info="T12 teplota čidla na výstupu ekvitermního okruhu TO2", friendly_name="Podlahovka patro", homeassistant_class="temperature"),
+    "upperFloorRequest": Sensor(type=float, name="txt526", unit="°C", convertor=parseTemperature, info="Požadovaná teplota ekvitermního okruhu TO2", homeassistant_class="temperature"),
     "upperFloorMixing": Sensor(type=float, name="txt527", unit="%", info="Velikost otevření třícestného směšovacího ventilu okruhu TO2 v procentech", convertor=lambda x: int(x[:-1]), friendly_name="Směšovač patro", homeassistant_icon="mdi:call-merge"),
     "upperFloorLimiting": Sensor(type=bool, name="col116", info="Útlum topného okruhu TO2, True=útlum aktivní", convertor=lambda x: x=="1"),
     "upperFloorActive": Sensor(type=bool, name="col207", info="Vstup z prostorového termostatu TO2, True=požadavek top", convertor=lambda x: x=="1", friendly_name="Podlahové topení patro"),
     "upperFloorCirculation": Sensor(type=bool, name="_ico108", info="Stav oběhového čerpadla topného okruhu TO2", convertor=lambda x: x=="3"),
 
-    "fireplace": Sensor(type=float, name="txt104", unit="°C", convertor=parseTemperature, info="T04 teplota čidla krbu", friendly_name="Krbová vložka"),
+    "fireplace": Sensor(type=float, name="txt104", unit="°C", convertor=parseTemperature, info="T04 teplota čidla krbu", friendly_name="Krbová vložka", homeassistant_class="temperature"),
     "fireplaceCirculation": Sensor(type=bool, name="_ico104", info="Stav oběhového čerpadla krbového okruhu", convertor=lambda x: x=="3", friendly_name="Oběh krbových kamen"),
 
-    "solarTemperature": Sensor(type=float, name="txt105", unit="°C", convertor=parseTemperature, info="T05 teplota čidla solárních panelů", homeassistant_icon="mdi:sun-thermometer"),
+    "solarTemperature": Sensor(type=float, name="txt105", unit="°C", convertor=parseTemperature, info="T05 teplota čidla solárních panelů", homeassistant_icon="mdi:sun-thermometer", homeassistant_class="temperature", homeassistant_sclass="measurement"),
     "solarCirculation": Sensor(type=bool, name="col420", info="Stav oběhového čerpadla solárních panelů", convertor=lambda x: x=="1", homeassistant_class="running", homeassistant_icon="mdi:sun-wireless"),
 
     #"SP1Power": Sensor(type=float, name="txt590", unit='kW', info="Výkon patrony SP1", friendly_name="Výkon patrony SP1"),
@@ -194,7 +195,7 @@ class IQR23:
         return await getXml(f"{self.host}/{file}.xml")
     
     async def load(self):
-        _LOGGER.warning(f"Loading....")
+        #_LOGGER.warning(f"Loading....")
         files = (
             'data',
             'data_i_all',
