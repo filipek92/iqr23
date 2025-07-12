@@ -1,5 +1,8 @@
 {
   "name": "iQ R23",
+  "content_in_root": false,
+  "filename": "iqr23",
   "render_readme": true,
-  "iot_class": "local_polling"
+  "iot_class": "local_polling",
+  "homeassistant": "2023.1.0"
 }

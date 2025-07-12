@@ -50,3 +50,26 @@ The integration can be configured through the Home Assistant UI:
 
 ### Switches
 - Various digital outputs (SP1, SP2, OVR, etc.)
+
+## Requirements
+
+- Home Assistant 2023.1.0 or newer
+- iQ R23 heating controller with network connectivity
+- Network access to the controller from Home Assistant
+
+## Troubleshooting
+
+If you encounter issues:
+
+1. Verify the IP address/hostname of your iQ R23 controller
+2. Ensure the controller is accessible from your Home Assistant instance
+3. Check the Home Assistant logs for any error messages
+4. Restart Home Assistant after installation
+
+## Support
+
+For issues and feature requests, please use the [GitHub repository](https://github.com/filipek92/iqr23/issues).
+
+## License
+
+This integration is released under the MIT License.
