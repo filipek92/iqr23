@@ -40,11 +40,13 @@ class IQR23Sensor(SensorEntity):
     async def async_update(self) -> None:
         try:
             self._attr_native_value = await self._api.getSensor(self._uid)
-            #self._attr_extra_state_attributes = res["info"]
             self._attr_available = True
-        except (asyncio.TimeoutError, aiohttp.ClientError, KeyError) as e:
-            _LOGGER.debug(f"Error updating sensor {self._uid}: {e}")
+        except KeyError as e:
+            _LOGGER.debug(f"Sensor {self._uid} not found in device state: {e}")
             self._attr_available = False
+        except (asyncio.TimeoutError, aiohttp.ClientError) as e:
+            _LOGGER.debug(f"Transient error updating sensor {self._uid}, keeping cached value: {e}")
+            # Keep already-set available state; do not mark unavailable on transient network error
 
     @property
     def device_info(self):
