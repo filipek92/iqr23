@@ -45,12 +45,13 @@ class IQR23BinarySensor(BinarySensorEntity):
         try:
             value = await self._api.getSensor(self._uid)
             self._attr_is_on = (not value) if self._sensor_info.homeassistant_inversed else value
-
-            #self._attr_extra_state_attributes = res["info"]
             self._attr_available = True
-        except (asyncio.TimeoutError, aiohttp.ClientError, KeyError) as e:
-            _LOGGER.exception(e)
+        except KeyError as e:
+            _LOGGER.debug(f"Sensor {self._uid} not found in device state: {e}")
             self._attr_available = False
+        except (asyncio.TimeoutError, aiohttp.ClientError) as e:
+            _LOGGER.debug(f"Transient error updating binary sensor {self._uid}, keeping cached state: {e}")
+            # Keep already-set available state; do not mark unavailable on transient network error
 
     @property
     def name(self):

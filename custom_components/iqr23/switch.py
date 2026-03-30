@@ -38,11 +38,13 @@ class IQR23Switch(SwitchEntity):
     async def async_update(self) -> None:
         try:
             self._attr_is_on = await self._api.getDigitalOutputState(self._uid)
-            #self._attr_extra_state_attributes = res["info"]
-            self._attr_available = (await self._api.getDigitalOutputMode(self._uid)) in ["on", "off"]
-        except (asyncio.TimeoutError, aiohttp.ClientError, KeyError) as e:
-            _LOGGER.debug(f"Error updating switch {self._uid}: {e}")
+            self._attr_available = True
+        except KeyError as e:
+            _LOGGER.debug(f"Sensor {self._uid} not found in device state: {e}")
             self._attr_available = False
+        except (asyncio.TimeoutError, aiohttp.ClientError) as e:
+            _LOGGER.debug(f"Transient error updating switch {self._uid}, keeping cached state: {e}")
+            # Keep already-set available state; do not mark unavailable on transient network error
 
     @property
     def name(self):

@@ -15,7 +15,8 @@ def sptime(value):
     return round(h+m/60, 2)
 
 def parseTemperature(value: str):
-    if value == '--.-':
+    value = value.strip()
+    if value in {'--.-', '-.-', '--', '-'}:
         return float('NaN')
     return float(value)
 
@@ -131,7 +132,19 @@ SENSORS = {
     "watertankLowerRequest": Sensor(type=float, name="txt502", unit="°C", convertor=parseTemperature, info="Požadovaná teplota S2 dolní části zásobníku"),
     "watertankLowerHeating": Sensor(type=bool, name="_ico102", info="Topná spirála SP2", convertor=lambda x: x=="1", homeassistant_class="heat", friendly_name="Topení zásobníku dole"),
     "watertankLowerHeatingTime": Sensor(type=float, name="txt741", unit="h", info="Čas topení spirály SP2", convertor=sptime, friendly_name="Topení zásobníku dole čas", homeassistant_icon="mdi:clock"),
+    "watertankSafetySensor": Sensor(type=bool, name="col201", info="Stav vstupu bezpečnostního teplotního čidla 95°C, True = OK", convertor=lambda x: x=="1", homeassistant_class="problem", homeassistant_inversed=True, friendly_name="Bezpečnostní čidlo 95°C"),
     "watertankPressure": Sensor(type=bool, name="col202", info="Stav vstupu tlakového čidla, True = OK", homeassistant_class="problem", homeassistant_inversed=True, friendly_name="Tlak v systému"),
+    "watertankUpperOvercurrent": Sensor(type=bool, name="col204", info="Stav vstupu nadproudové ochrany HJ103 spirály SP1, True = OK", convertor=lambda x: x=="1", homeassistant_class="problem", homeassistant_inversed=True, friendly_name="Nadproud SP1"),
+    "watertankLowerOvercurrent": Sensor(type=bool, name="col205", info="Stav vstupu nadproudové ochrany HJ103 spirály SP2, True = OK", convertor=lambda x: x=="1", homeassistant_class="problem", homeassistant_inversed=True, friendly_name="Nadproud SP2"),
+    "coolingTankTemperature": Sensor(type=float, name="txt109", unit="°C", convertor=parseTemperature, info="Teplota čidla Tchl", friendly_name="Chlazení teplota", homeassistant_class="temperature"),
+    "poolTemperatureFilter": Sensor(type=float, name="txt107", unit="°C", convertor=parseTemperature, info="Teplota čidla bazénu na filtraci", friendly_name="Bazén filtrace", homeassistant_class="temperature"),
+    "poolTemperatureExchanger": Sensor(type=float, name="txt108", unit="°C", convertor=parseTemperature, info="Teplota čidla bazénu na výměníku", friendly_name="Bazén výměník", homeassistant_class="temperature"),
+    "poolTemperatureMin": Sensor(type=float, name="txt730", unit="°C", convertor=parseTemperature, info="Teplota bazénu minimální", friendly_name="Bazén minimální teplota", homeassistant_class="temperature"),
+    "poolTemperatureMax": Sensor(type=float, name="txt731", unit="°C", convertor=parseTemperature, info="Teplota bazénu maximální", friendly_name="Bazén maximální teplota", homeassistant_class="temperature"),
+    "poolFiltrationCirculation": Sensor(type=bool, name="col213", info="Oběhové čerpadlo bazénové filtrace", convertor=lambda x: x=="1", homeassistant_class="running", friendly_name="Bazén filtrace oběh"),
+    "poolAzTemperatureReady": Sensor(type=bool, name="col292", info="Teplota AZ je OK pro spuštění OČ", convertor=lambda x: x=="1", friendly_name="Bazén TAZ připraveno"),
+    "poolSolarTemperatureReady": Sensor(type=bool, name="col293", info="Teplota Solaru je OK pro spuštění OČ", convertor=lambda x: x=="1", friendly_name="Bazén TSO připraveno"),
+    "poolError": Sensor(type=bool, name="col294", info="Porucha čidla nebo vysoká Tvym", convertor=lambda x: x=="1", homeassistant_class="problem", friendly_name="Bazén chyba"),
 
     "lowerFloor": Sensor(type=float, name="txt111", unit="°C", convertor=parseTemperature, info="T11 teplota čidla na výstupu ekvitermního okruhu TO1", friendly_name="Podlahovka přízemí", homeassistant_class="temperature"),
     "lowerFloorRequest": Sensor(type=float, name="txt520", unit="°C", convertor=parseTemperature, info="Požadovaná teplota ekvitermního okruhu TO1", homeassistant_class="temperature"),
@@ -153,8 +166,26 @@ SENSORS = {
     "solarTemperature": Sensor(type=float, name="txt105", unit="°C", convertor=parseTemperature, info="T05 teplota čidla solárních panelů", homeassistant_icon="mdi:sun-thermometer", homeassistant_class="temperature", homeassistant_sclass="measurement"),
     "solarCirculation": Sensor(type=bool, name="col420", info="Stav oběhového čerpadla solárních panelů", convertor=lambda x: x=="1", homeassistant_class="running", homeassistant_icon="mdi:sun-wireless"),
 
-    #"SP1Power": Sensor(type=float, name="txt590", unit='kW', info="Výkon patrony SP1", friendly_name="Výkon patrony SP1"),
-    #"SP2Power": Sensor(type=float, name="txt591", unit='kW', info="Výkon patrony SP2", friendly_name="Výkon patrony SP2"),
+    "digitalInputT95": Sensor(type=bool, name="col300", info="Digitální vstup T95", convertor=lambda x: x=="1", friendly_name="DI T95"),
+    "digitalInputPressure": Sensor(type=bool, name="col305", info="Digitální vstup tlak", convertor=lambda x: x=="1", friendly_name="DI Tlak"),
+    "digitalInputLowTariff": Sensor(type=bool, name="col310", info="Digitální vstup NT", convertor=lambda x: x=="1", friendly_name="DI NT"),
+    "digitalInputNP1": Sensor(type=bool, name="col315", info="Digitální vstup NP1", convertor=lambda x: x=="1", friendly_name="DI NP1"),
+    "digitalInputNP2": Sensor(type=bool, name="col320", info="Digitální vstup NP2", convertor=lambda x: x=="1", friendly_name="DI NP2"),
+    "digitalInputTO1": Sensor(type=bool, name="col325", info="Digitální vstup TO1", convertor=lambda x: x=="1", friendly_name="DI TO1"),
+    "digitalInputTO2": Sensor(type=bool, name="col330", info="Digitální vstup TO2", convertor=lambda x: x=="1", friendly_name="DI TO2"),
+    "digitalInputDEF": Sensor(type=bool, name="col335", info="Digitální vstup DEF", convertor=lambda x: x=="1", friendly_name="DI DEF"),
+    "digitalInputUPS": Sensor(type=bool, name="col340", info="Digitální vstup UPS", convertor=lambda x: x=="1", friendly_name="DI UPS"),
+    "digitalInputTC": Sensor(type=bool, name="col345", info="Digitální vstup T/C", convertor=lambda x: x=="1", friendly_name="DI T/C"),
+    "digitalInputPRU": Sensor(type=bool, name="col350", info="Digitální vstup PRU (kontrola průtoku TČ)", convertor=lambda x: x=="1", friendly_name="DI PRU"),
+    "digitalInputTF1": Sensor(type=bool, name="col355", info="Digitální vstup TF1", convertor=lambda x: x=="1", friendly_name="DI TF1"),
+    "digitalInputTF2": Sensor(type=bool, name="col360", info="Digitální vstup TF2", convertor=lambda x: x=="1", friendly_name="DI TF2"),
+    "digitalInputTF3": Sensor(type=bool, name="col365", info="Digitální vstup TF3", convertor=lambda x: x=="1", friendly_name="DI TF3"),
+    "digitalInputPLo": Sensor(type=bool, name="col375", info="Digitální vstup PLo", convertor=lambda x: x=="1", friendly_name="DI PLo"),
+    "digitalInputPHi": Sensor(type=bool, name="col380", info="Digitální vstup PHi", convertor=lambda x: x=="1", friendly_name="DI PHi"),
+    "digitalInputTTo": Sensor(type=bool, name="col385", info="Digitální vstup TTo", convertor=lambda x: x=="1", friendly_name="DI TTo"),
+    "digitalInputTCh": Sensor(type=bool, name="col390", info="Digitální vstup TCh", convertor=lambda x: x=="1", friendly_name="DI TCh"),
+    "digitalInputAS1": Sensor(type=bool, name="col395", info="Digitální vstup AS1", convertor=lambda x: x=="1", friendly_name="DI AS1"),
+
 
     "lowTariff": Sensor(type=bool, name="col203", info="Stav vstupu NT nízkého tarifu HDO", convertor=lambda x: x=="1", friendly_name="Nízký tarif"),
     "waterCirculation": Sensor(type=bool, name="col106", info="Stav oběhového čerpadla cirkulace TUV ", convertor=lambda x: x=="1", homeassistant_class="running"),
@@ -222,18 +253,38 @@ class IQR23:
             'data_n_txo',
         )
 
-        self.state = dict()
-        for file in files:
-            file_data = await self.loadFile(file)
-            self.state.update(file_data)
+        # Keep previous values so a partial fetch failure does not invalidate entities.
+        results = await asyncio.gather(*(self.loadFile(file) for file in files), return_exceptions=True)
+        merged_state = dict()
+        failed_files = []
+
+        for file, result in zip(files, results):
+            if isinstance(result, Exception):
+                failed_files.append(file)
+                _LOGGER.warning("Failed to load %s.xml from %s: %s", file, self.host, result)
+                continue
+            merged_state.update(result)
+
+        if not merged_state:
+            raise RuntimeError(f"Unable to load any XML endpoint from {self.host}")
+
+        self.state.update(merged_state)
+        if failed_files:
+            _LOGGER.debug("Partial refresh for %s, failed files: %s", self.host, ", ".join(failed_files))
 
 
     async def loadIfRequired(self):
         now = time()
         async with self._sequential_lock:
             if self.loadtime + 5 < now:
-                await self.load() 
-                self.loadtime = now
+                try:
+                    await self.load()
+                    self.loadtime = now
+                except Exception as err:
+                    if self.state:
+                        _LOGGER.warning("Refresh failed for %s, using cached state: %s", self.host, err)
+                    else:
+                        raise
 
 
     async def login(self, level=AccessLevel.LOGOUT):
@@ -251,9 +302,21 @@ class IQR23:
                 return False
     
     async def logout(self, save=False):
+        """Log out from device.
+        
+        Args:
+            save: If True, save settings before logout (press save button).
+        """
         if save:
-            await self._pressBtn(Buttons.SAVE)
-        await self.login(AccessLevel.LOGOUT)
+            try:
+                await self._pressBtn(Buttons.SAVE)
+            except Exception as e:
+                _LOGGER.warning("Failed to save settings before logout: %s", e)
+        
+        try:
+            await self.login(AccessLevel.LOGOUT)
+        except Exception as e:
+            _LOGGER.error("Failed to logout: %s", e)
 
     async def _pressBtn(self, button: int):
         async with self._sequential_lock:
@@ -263,24 +326,54 @@ class IQR23:
                         f'{self.host}/t_but.cgi?but={button}',
                         timeout=aiohttp.ClientTimeout(total=10)
                     ) as response:
+                        if response.status != 200:
+                            _LOGGER.error(f"Button press returned status {response.status}")
                         return response.status == 200
             except Exception as e:
                 _LOGGER.error(f"Button press failed: {e}")
                 return False
 
     async def setDigitalOutputMode(self, output, value):
+        """Set digital output mode (on/off/auto modes).
+        
+        Sequence: login → press button → logout (with save) → reload state.
+        Resilient to partial failures.
+        """
         try:
-            output = DIGITAL_OUTPUTS[output]
+            output_info = DIGITAL_OUTPUTS[output]
         except KeyError: 
-            raise KeyError("Output not found")
+            raise KeyError(f"Output {output} not found")
+        
         try:
-            btn = output.control_set[value]
+            btn = output_info.control_set[value]
         except KeyError:
-            raise KeyError("Value not found")
-        await self.login(AccessLevel.MASTER)
-        await self._pressBtn(btn)
-        await self.logout()
-        await self.load()
+            raise KeyError(f"Value {value} not found for output {output}")
+        
+        try:
+            success = await self.login(AccessLevel.MASTER)
+            if not success:
+                raise RuntimeError("Failed to login with MASTER access")
+            
+            success = await self._pressBtn(btn)
+            if not success:
+                _LOGGER.warning(f"Button press for {output}={value} failed, attempting logout")
+            
+            # Always try logout with save to avoid device lock
+            await self.logout(save=True)
+            
+            # Refresh state to confirm the change
+            try:
+                await self.load()
+            except Exception as e:
+                _LOGGER.warning(f"Failed to reload state after setting {output}={value}: {e}")
+                # Even if state reload fails, the command was sent
+                
+        except asyncio.TimeoutError as e:
+            _LOGGER.error(f"Timeout setting {output}={value}: {e}")
+            raise
+        except Exception as e:
+            _LOGGER.error(f"Error setting {output}={value}: {e}")
+            raise
     
     async def getDigitalOutputMode(self, output):
         await self.loadIfRequired()
