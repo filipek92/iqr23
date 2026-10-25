@@ -3,6 +3,7 @@
   "name": "iQ R23",
   "codeowners": ["@filipek92"],
   "config_flow": true,
+  "dependencies": ["frontend", "http"],
   "documentation": "https://github.com/filipek92/iqr23",
   "integration_type": "device",
   "iot_class": "local_polling",

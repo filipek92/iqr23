@@ -3,6 +3,10 @@
 ## [Unreleased]
 
 ### Added
+- Lovelace card `custom:iqr23-card` bundled with the integration, no separate installation needed:
+  outdoor temperature, fault banner, storage tank with heating state, heating circuits with pump,
+  demand, setback and mixing valve, fireplace/solar/pool/cooling tiles and -/+ buttons for the tank
+  base temperature and curve shifts. Presses are collected and sent as one change.
 - Setpoint numbers: tank base temperature and seasonal S1/S2 targets, heating circuit TO1/TO2 curve,
   night setback, curve shift and flow limits, fireplace start temperature and hysteresis, solar
   temperature difference, pool and cooling on/off temperatures. The controller only offers -/+ buttons,

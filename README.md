@@ -63,6 +63,23 @@ data:
 
 Data is polled every 15 seconds.
 
+## Dashboard card
+
+The integration ships a Lovelace card, so nothing else has to be installed. After a restart, add
+the **iQ R23** card from the card picker, or in YAML:
+
+```yaml
+type: custom:iqr23-card
+device_id: 0123456789abcdef  # optional, the first iQ R23 device is used otherwise
+title: Kotelna               # optional
+show_controls: true          # optional, -/+ buttons for setpoints
+```
+
+The card shows the outdoor temperature, active faults, the storage tank, heating circuits and the
+fireplace, solar, pool and cooling temperatures. Sections of disabled modules are left out.
+Entities are found by the device, so renamed entity IDs keep working. The -/+ buttons collect
+presses and send one change after a short pause, since each change logs in to the controller.
+
 ## Upgrading from 1.x
 
 Existing configuration is migrated automatically and entity IDs, custom names and history are kept.
