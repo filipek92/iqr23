@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.0] - Unreleased
+## [2.0.0] - 2026-10-25
 
 ### Breaking
 - Output switches were removed. Each output (SP1, SP2, OVR, KRB, SOL, TVC, TO1, TO2, TCC, T/C, H/D, STO) now has
