@@ -88,10 +88,10 @@ async def async_migrate_entry(hass: HomeAssistant, entry: IQR23ConfigEntry) -> b
 
         await er.async_migrate_entries(hass, entry.entry_id, _migrate_unique_id)
 
-        # 1.x identified the device by its host URL.
+        # 1.x identified the device by its host URL (or an empty string in old releases).
         device_registry = dr.async_get(hass)
         for device in dr.async_entries_for_config_entry(device_registry, entry.entry_id):
-            if (DOMAIN, entry.data[CONF_HOST]) in device.identifiers:
+            if any(domain == DOMAIN for domain, _ in device.identifiers):
                 device_registry.async_update_device(
                     device.id, new_identifiers={(DOMAIN, entry.entry_id)}
                 )
