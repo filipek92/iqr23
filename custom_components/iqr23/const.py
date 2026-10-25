@@ -1,4 +1,21 @@
+"""Constants for the iQ R23 integration."""
+
+from datetime import timedelta
+
+from homeassistant.const import Platform
+
 DOMAIN = "iqr23"
 MANUFACTURER = "IQ Topeni"
 MODEL = "iQ R23"
-PLATFORMS = ["sensor", "binary_sensor", "switch"]
+
+PLATFORMS = [Platform.BINARY_SENSOR, Platform.SELECT, Platform.SENSOR]
+
+CONF_MASTER_PASSWORD = "master_password"
+CONF_MODULES = "modules"
+CONF_VERSION = "version"
+
+DEFAULT_MASTER_PASSWORD = "Servis254"
+
+UPDATE_INTERVAL = timedelta(seconds=15)
+# Number of consecutive failed polls tolerated before entities become unavailable.
+MAX_CONSECUTIVE_FAILURES = 3

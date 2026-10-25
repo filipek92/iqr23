@@ -1,0 +1,28 @@
+{
+  "entity": {
+    "binary_sensor": {
+      "floor_lower_setback": { "default": "mdi:sleep" },
+      "floor_upper_setback": { "default": "mdi:sleep" },
+      "low_tariff": { "default": "mdi:transmission-tower" },
+      "ups": { "default": "mdi:power-plug-battery" }
+    },
+    "select": {
+      "output_mode": {
+        "default": "mdi:electric-switch",
+        "state": {
+          "auto": "mdi:autorenew",
+          "auto_r": "mdi:autorenew",
+          "on": "mdi:toggle-switch",
+          "off": "mdi:toggle-switch-off-outline"
+        }
+      }
+    },
+    "sensor": {
+      "floor_lower_mixing": { "default": "mdi:call-merge" },
+      "floor_upper_mixing": { "default": "mdi:call-merge" },
+      "solar": { "default": "mdi:sun-thermometer" },
+      "tank_upper_heating_time": { "default": "mdi:timer-outline" },
+      "tank_lower_heating_time": { "default": "mdi:timer-outline" }
+    }
+  }
+}

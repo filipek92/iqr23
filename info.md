@@ -8,7 +8,7 @@ This Home Assistant custom integration provides connectivity with iQ R23 heating
 
 - **Temperature monitoring** - Track temperatures from multiple zones and sensors
 - **System status** - Monitor pump status, pressure, heating elements
-- **Remote control** - Control digital outputs and switches
+- **Output control** - Switch every output between Auto, AutoR, On and Off
 - **Real-time updates** - Automatic polling for current data
 
 ## Quick Setup

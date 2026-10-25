@@ -2,20 +2,226 @@
   "config": {
     "step": {
       "user": {
-        "title": "iQ R23 Regulace topení",
+        "title": "iQ R23",
         "data": {
-          "host": "Server nebo IP adresa"
+          "host": "Server nebo IP adresa",
+          "master_password": "Servisní (master) heslo"
+        },
+        "data_description": {
+          "host": "Adresa webového rozhraní regulace, např. 192.168.1.20",
+          "master_password": "Potřeba pro přepínání režimů výstupů"
+        }
+      },
+      "reconfigure": {
+        "title": "iQ R23",
+        "data": {
+          "host": "Server nebo IP adresa",
+          "master_password": "Servisní (master) heslo"
+        },
+        "data_description": {
+          "host": "Adresa webového rozhraní regulace, např. 192.168.1.20",
+          "master_password": "Potřeba pro přepínání režimů výstupů"
         }
       }
     },
     "error": {
-      "multiple_hosts": "Očekávána odpověď od právě jednoho ovladače, obdržena odpověď od více.",
-      "cannot_connect": "Nelze se připojit k řídicí jednotce.",
-      "invalid_auth": "Neplatné uživatelské jméno nebo heslo.",
-      "unknown": "Neznámá chyba."
+      "cannot_connect": "Nelze se připojit k regulaci.",
+      "unknown": "Neočekávaná chyba."
     },
     "abort": {
-      "already_configured": "Tento ovladač je již nakonfigurován."
+      "already_configured": "Tato regulace je již nakonfigurována.",
+      "reconfigure_successful": "Změna nastavení proběhla úspěšně.",
+      "wrong_device": "Adresa patří jiné regulaci."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "outdoor_temperature": {
+        "name": "Venkovní teplota"
+      },
+      "outdoor_temperature_min": {
+        "name": "Venkovní teplota 24h min"
+      },
+      "outdoor_temperature_max": {
+        "name": "Venkovní teplota 24h max"
+      },
+      "outdoor_temperature_mean": {
+        "name": "Venkovní teplota 24h průměr"
+      },
+      "tank_upper": {
+        "name": "Zásobník nahoře"
+      },
+      "tank_upper_target": {
+        "name": "Zásobník nahoře požadovaná"
+      },
+      "tank_upper_heating_time": {
+        "name": "SP1 doba topení"
+      },
+      "tank_middle": {
+        "name": "Zásobník střed"
+      },
+      "tank_lower": {
+        "name": "Zásobník dole"
+      },
+      "tank_lower_target": {
+        "name": "Zásobník dole požadovaná"
+      },
+      "tank_lower_heating_time": {
+        "name": "SP2 doba topení"
+      },
+      "floor_lower": {
+        "name": "Okruh TO1"
+      },
+      "floor_lower_target": {
+        "name": "Okruh TO1 požadovaná"
+      },
+      "floor_lower_mixing": {
+        "name": "Okruh TO1 směšovač"
+      },
+      "floor_upper": {
+        "name": "Okruh TO2"
+      },
+      "floor_upper_target": {
+        "name": "Okruh TO2 požadovaná"
+      },
+      "floor_upper_mixing": {
+        "name": "Okruh TO2 směšovač"
+      },
+      "fireplace": {
+        "name": "Krb"
+      },
+      "solar": {
+        "name": "Solární kolektor"
+      },
+      "cooling": {
+        "name": "Chlazení"
+      },
+      "pool_filter": {
+        "name": "Bazén filtrace"
+      },
+      "pool_exchanger": {
+        "name": "Bazén výměník"
+      },
+      "pool_min": {
+        "name": "Bazén minimum"
+      },
+      "pool_max": {
+        "name": "Bazén maximum"
+      }
+    },
+    "binary_sensor": {
+      "tank_upper_heating": {
+        "name": "SP1 topení"
+      },
+      "tank_lower_heating": {
+        "name": "SP2 topení"
+      },
+      "safety_thermostat": {
+        "name": "Bezpečnostní termostat 95 °C"
+      },
+      "pressure": {
+        "name": "Tlak v systému"
+      },
+      "overcurrent_sp1": {
+        "name": "SP1 nadproud"
+      },
+      "overcurrent_sp2": {
+        "name": "SP2 nadproud"
+      },
+      "floor_lower_demand": {
+        "name": "Okruh TO1 požadavek termostatu"
+      },
+      "floor_lower_setback": {
+        "name": "Okruh TO1 útlum"
+      },
+      "floor_lower_pump": {
+        "name": "Okruh TO1 čerpadlo"
+      },
+      "floor_upper_demand": {
+        "name": "Okruh TO2 požadavek termostatu"
+      },
+      "floor_upper_setback": {
+        "name": "Okruh TO2 útlum"
+      },
+      "floor_upper_pump": {
+        "name": "Okruh TO2 čerpadlo"
+      },
+      "fireplace_pump": {
+        "name": "Krb čerpadlo"
+      },
+      "hot_water_circulation": {
+        "name": "Cirkulace TUV"
+      },
+      "low_tariff": {
+        "name": "Nízký tarif"
+      },
+      "ups": {
+        "name": "Záložní zdroj"
+      },
+      "pool_pump": {
+        "name": "Bazén čerpadlo filtrace"
+      },
+      "pool_tank_ready": {
+        "name": "Bazén teplota AZ připravena"
+      },
+      "pool_solar_ready": {
+        "name": "Bazén teplota solaru připravena"
+      },
+      "pool_error": {
+        "name": "Bazén porucha"
+      },
+      "output_running": {
+        "name": "{output} výstup"
+      },
+      "digital_input": {
+        "name": "Vstup {input}"
+      }
+    },
+    "select": {
+      "output_mode": {
+        "name": "{output} režim",
+        "state": {
+          "auto": "Auto",
+          "auto_r": "AutoR",
+          "on": "On",
+          "off": "Off"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "set_mode_failed": {
+      "message": "Nepodařilo se nastavit režim výstupu {output}: {error}"
+    }
+  },
+  "issues": {
+    "switches_removed": {
+      "title": "Přepínače iQ R23 byly nahrazeny výběry",
+      "description": "Přepínače výstupů byly odstraněny: {entities}.\n\nKaždý výstup má nyní výběr režimu (Auto / AutoR / On / Off) a binární senzor se skutečným stavem výstupu. Upravte automatizace a dashboardy, které přepínače používaly."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Instalované moduly",
+        "description": "Regulace je univerzální. Entity se vytvoří jen pro vybrané moduly.",
+        "data": {
+          "modules": "Moduly"
+        }
+      }
+    }
+  },
+  "selector": {
+    "modules": {
+      "options": {
+        "tank": "Akumulační zásobník (SP1, SP2)",
+        "circuit_1": "Topný okruh TO1",
+        "circuit_2": "Topný okruh TO2",
+        "fireplace": "Krb",
+        "solar": "Solární kolektor",
+        "cooling": "Chlazení",
+        "pool": "Bazén"
+      }
     }
   }
 }

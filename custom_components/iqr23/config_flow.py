@@ -1,98 +1,156 @@
-import logging
+"""Config flow for the iQ R23 integration."""
 
-from .iqr23 import IQR23
+from __future__ import annotations
+
+import logging
+from typing import Any
 
 import voluptuous as vol
-from homeassistant import config_entries, exceptions, core
-from homeassistant.helpers.device_registry import format_mac
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlow,
+)
+from homeassistant.const import CONF_HOST
+from homeassistant.core import callback
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.selector import (
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
+)
 
-#from skydance.network.discovery import discover_ips_by_mac
-from .const import DOMAIN
+from .api import IQR23Client, IQR23ConnectionError, normalize_host
+from .const import (
+    CONF_MASTER_PASSWORD,
+    CONF_MODULES,
+    CONF_VERSION,
+    DEFAULT_MASTER_PASSWORD,
+    DOMAIN,
+)
+from .modules import Module, detect_modules, enabled_modules
 
 _LOGGER = logging.getLogger(__name__)
 
-DATA_SCHEMA = vol.Schema({vol.Required("host"): str})
 
-# TODO stub of auto-discovery follows:
-# async def _async_has_devices(hass) -> bool:
-#     """Return if there are devices that can be discovered."""
-#     local_ip = get_local_ip()
-#     # simply assume /24 network
-#     assumed_network_mask = "24"
-#     network = ipaddress.IPv4Network(local_ip + "/" + assumed_network_mask, strict=False)
-#     res = await discover_ips_by_mac(str(network.broadcast_address), broadcast=True)
-#     return len(res) > 0
-#
-# config_entry_flow.register_discovery_flow(DOMAIN, MANUFACTURER, _async_has_devices, config_entries.CONN_CLASS_ASSUMED)
+def _schema(host: str = "", master_password: str = DEFAULT_MASTER_PASSWORD) -> vol.Schema:
+    return vol.Schema(
+        {
+            vol.Required(CONF_HOST, default=host): str,
+            vol.Required(CONF_MASTER_PASSWORD, default=master_password): str,
+        }
+    )
 
 
-async def validate_input(hass: core.HomeAssistant, data: dict):
-    """
-    Validate the user input by executing an IQR23 discovery protocol.
-
-    Data has the keys from DATA_SCHEMA with values provided by the user.
-    """
-    if not data["host"]:
-        raise InvalidHost()
-    try:
-        host = data['host']
-        _LOGGER.info(f"Trying to discover on {host}")
-        discovery_result = await IQR23.discovery(host)
-    except Exception as e:
-        _LOGGER.exception(f"Discovery failed for {host}: {e}")
-        raise CannotConnect() from e
-
-    if not discovery_result:
-        _LOGGER.error(f"No discovery response from {host}")
-        raise CannotConnect()
-
-    return discovery_result
+MODULES_SELECTOR = SelectSelector(
+    SelectSelectorConfig(
+        options=[module.value for module in Module],
+        multiple=True,
+        mode=SelectSelectorMode.LIST,
+        translation_key=CONF_MODULES,
+    )
+)
 
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_ASSUMED
+class IQR23ConfigFlow(ConfigFlow, domain=DOMAIN):
+    """Handle a config flow for iQ R23."""
 
-    async def async_step_user(self, user_input=None):
-        """Handle the initial step of config flow initiated by user manually."""
-        errors = {}
+    VERSION = 2
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> IQR23OptionsFlow:
+        return IQR23OptionsFlow()
+
+    async def _async_validate(
+        self, user_input: dict[str, Any], errors: dict[str, str]
+    ) -> dict[str, Any] | None:
+        """Return entry data when the controller answers, filling errors otherwise."""
+        host = normalize_host(user_input[CONF_HOST])
+        client = IQR23Client(
+            async_get_clientsession(self.hass), host, user_input[CONF_MASTER_PASSWORD]
+        )
+        try:
+            version = await client.async_get_version()
+        except IQR23ConnectionError as err:
+            _LOGGER.debug("Cannot connect to %s: %s", host, err)
+            errors["base"] = "cannot_connect"
+            return None
+        except Exception:
+            _LOGGER.exception("Unexpected error connecting to %s", host)
+            errors["base"] = "unknown"
+            return None
+        return {
+            CONF_HOST: host,
+            CONF_MASTER_PASSWORD: user_input[CONF_MASTER_PASSWORD],
+            CONF_VERSION: version,
+        }
+
+    async def async_step_user(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        errors: dict[str, str] = {}
         if user_input is not None:
-            try:
-                discovery_result = await validate_input(self.hass, user_input)
-                host = user_input["host"]
-                if not host.startswith('http://'):
-                    host =  'http://'+host
-
-                data = {
-                    "host": host,
-                    "version": discovery_result
-                }
-                _LOGGER.info("Adding iQ R23 config entry with data=%s", data)
-                await self.async_set_unique_id(host)
+            if data := await self._async_validate(user_input, errors):
+                await self.async_set_unique_id(data[CONF_HOST])
                 self._abort_if_unique_id_configured()
-                return self.async_create_entry(title=host, data=data)
-            except CannotConnect:
-                errors["base"] = "cannot_connect"
-            except InvalidHost:
-                errors["host"] = "cannot_connect"
-            except MultipleHosts:
-                errors["host"] = "multiple_hosts"
-            except Exception as e:  # NOQA
-                _LOGGER.exception(e)
-                errors["base"] = "unknown"
+                client = IQR23Client(
+                    async_get_clientsession(self.hass), data[CONF_HOST], data[CONF_MASTER_PASSWORD]
+                )
+                try:
+                    values, _ = await client.async_fetch()
+                    modules = detect_modules(values)
+                except IQR23ConnectionError:
+                    modules = [module.value for module in Module]
+                return self.async_create_entry(
+                    title=data[CONF_HOST], data=data, options={CONF_MODULES: modules}
+                )
 
         return self.async_show_form(
-            step_id="user", data_schema=DATA_SCHEMA, errors=errors
+            step_id="user",
+            data_schema=self.add_suggested_values_to_schema(_schema(), user_input),
+            errors=errors,
+        )
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        entry = self._get_reconfigure_entry()
+        errors: dict[str, str] = {}
+        if user_input is not None:
+            if data := await self._async_validate(user_input, errors):
+                await self.async_set_unique_id(data[CONF_HOST])
+                self._abort_if_unique_id_mismatch(reason="wrong_device")
+                return self.async_update_reload_and_abort(entry, data_updates=data)
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=_schema(
+                entry.data[CONF_HOST],
+                entry.data.get(CONF_MASTER_PASSWORD, DEFAULT_MASTER_PASSWORD),
+            ),
+            errors=errors,
         )
 
 
-class CannotConnect(exceptions.HomeAssistantError):
-    """Error to indicate we cannot connect."""
+class IQR23OptionsFlow(OptionsFlow):
+    """Choose which modules of the controller are installed."""
 
+    async def async_step_init(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        if user_input is not None:
+            return self.async_create_entry(data={**self.config_entry.options, **user_input})
 
-class InvalidHost(exceptions.HomeAssistantError):
-    """Error to indicate there is an invalid hostname."""
-
-
-class MultipleHosts(exceptions.HomeAssistantError):
-    """Error to indicate that we got multiple answers to the discovery request."""
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(
+                        CONF_MODULES,
+                        default=sorted(enabled_modules(self.config_entry)),
+                    ): MODULES_SELECTOR
+                }
+            ),
+        )

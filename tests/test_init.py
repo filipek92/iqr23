@@ -1,9 +1,169 @@
-"""Test component setup."""
-from homeassistant.setup import async_setup_component
+"""Tests of setup, entities and migration."""
 
-from custom_components.iqr23.const import DOMAIN
+from homeassistant.config_entries import ConfigEntryState
+from homeassistant.const import CONF_HOST
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import (
+    device_registry as dr,
+)
+from homeassistant.helpers import (
+    entity_registry as er,
+)
+from homeassistant.helpers import (
+    issue_registry as ir,
+)
+from pytest_homeassistant_custom_component.common import MockConfigEntry
+
+from custom_components.iqr23.api import DATA_FILES
+from custom_components.iqr23.const import (
+    CONF_MASTER_PASSWORD,
+    CONF_MODULES,
+    CONF_VERSION,
+    DOMAIN,
+)
+
+from .conftest import HOST, VERSION
 
 
-async def test_async_setup(hass):
-    """Test the component gets setup."""
-    assert await async_setup_component(hass, DOMAIN, {}) is True
+async def _setup(hass: HomeAssistant, entry: MockConfigEntry) -> None:
+    entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+
+async def test_setup_creates_entities(
+    hass: HomeAssistant, mock_device, config_entry, entity_registry: er.EntityRegistry
+) -> None:
+    await _setup(hass, config_entry)
+    assert config_entry.state is ConfigEntryState.LOADED
+
+    assert hass.states.get("sensor.iq_r23_outdoor_temperature").state == "5.4"
+    assert hass.states.get("sensor.iq_r23_sp2_heating_time").state == "4106.43"
+    assert hass.states.get("sensor.iq_r23_circuit_to1_mixing_valve").state == "15"
+    assert hass.states.get("binary_sensor.iq_r23_system_pressure").state == "off"
+    assert hass.states.get("binary_sensor.iq_r23_krb_output").state == "on"
+    assert hass.states.get("binary_sensor.iq_r23_sp1_overcurrent").state == "off"
+    # NP2 input is disabled in the controller ('4'), which is not a fault.
+    assert hass.states.get("binary_sensor.iq_r23_sp2_overcurrent").state == "off"
+
+    sp1 = hass.states.get("select.iq_r23_sp1_mode")
+    assert sp1.state == "off"
+    assert sp1.attributes["options"] == ["auto", "auto_r", "on", "off"]
+    assert hass.states.get("select.iq_r23_krb_mode").state == "auto"
+
+    # Modules not selected in options are not created at all.
+    assert entity_registry.async_get("sensor.iq_r23_pool_filtration") is None
+    np2 = entity_registry.async_get("binary_sensor.iq_r23_input_np2")
+    assert np2.disabled_by is er.RegistryEntryDisabler.INTEGRATION
+
+    assert await hass.config_entries.async_unload(config_entry.entry_id)
+    assert config_entry.state is ConfigEntryState.NOT_LOADED
+
+
+async def test_select_option_presses_mode_button(
+    hass: HomeAssistant, mock_device, config_entry
+) -> None:
+    await _setup(hass, config_entry)
+    mock_device.mock_calls.clear()
+
+    await hass.services.async_call(
+        "select",
+        "select_option",
+        {"entity_id": "select.iq_r23_sp1_mode", "option": "auto"},
+        blocking=True,
+    )
+
+    urls = [str(url) for _, url, _, _ in mock_device.mock_calls]
+    assert f"{HOST}/t_but.cgi?but=300" in urls
+    assert f"{HOST}/t_but.cgi?but=200" in urls
+
+
+async def test_setup_retries_when_offline(hass: HomeAssistant, aioclient_mock, config_entry) -> None:
+    aioclient_mock.get(f"{HOST}/data.xml", exc=TimeoutError)
+    for file in DATA_FILES[1:]:
+        aioclient_mock.get(f"{HOST}/{file}.xml", exc=TimeoutError)
+    config_entry.add_to_hass(hass)
+
+    await hass.config_entries.async_setup(config_entry.entry_id)
+
+    assert config_entry.state is ConfigEntryState.SETUP_RETRY
+
+
+async def test_migrate_from_v1(
+    hass: HomeAssistant,
+    mock_device,
+    entity_registry: er.EntityRegistry,
+    device_registry: dr.DeviceRegistry,
+    issue_registry: ir.IssueRegistry,
+) -> None:
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        version=1,
+        unique_id=HOST,
+        data={CONF_HOST: HOST, CONF_VERSION: VERSION},
+    )
+    entry.add_to_hass(hass)
+    device = device_registry.async_get_or_create(
+        config_entry_id=entry.entry_id, identifiers={(DOMAIN, HOST)}
+    )
+    temp = entity_registry.async_get_or_create(
+        "sensor", DOMAIN, "iqr23_outdoorTemp", config_entry=entry,
+        suggested_object_id="iqr23_outdoortemp",
+    )
+    entity_registry.async_update_entity(temp.entity_id, name="Venkovní teplota garáž")
+    solar = entity_registry.async_get_or_create(
+        "binary_sensor", DOMAIN, "iqr23_solarCirculation", config_entry=entry,
+        suggested_object_id="iqr23_solarcirculation",
+    )
+    switch = entity_registry.async_get_or_create(
+        "switch", DOMAIN, "iqr23_SP1", config_entry=entry, suggested_object_id="iqr23_sp1"
+    )
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert entry.version == 2
+    assert entry.data[CONF_MASTER_PASSWORD] == "Servis254"
+
+    migrated = entity_registry.async_get(temp.entity_id)
+    assert migrated.unique_id == f"{entry.entry_id}_outdoorTemp"
+    assert migrated.name == "Venkovní teplota garáž"
+    assert hass.states.get("sensor.iqr23_outdoortemp").state == "5.4"
+
+    assert entity_registry.async_get(solar.entity_id).unique_id == f"{entry.entry_id}_SOL_running"
+    # Modules are detected from connected sensors: no pool and cooling here.
+    assert entry.options[CONF_MODULES] == [
+        "tank", "circuit_1", "circuit_2", "fireplace", "solar"
+    ]
+    assert entity_registry.async_get(switch.entity_id) is None
+    assert issue_registry.async_get_issue(DOMAIN, "switches_removed")
+
+    assert device_registry.async_get(device.id).identifiers == {(DOMAIN, entry.entry_id)}
+
+
+async def test_diagnostics_redacts_password(hass: HomeAssistant, mock_device, config_entry) -> None:
+    from custom_components.iqr23.diagnostics import async_get_config_entry_diagnostics
+
+    await _setup(hass, config_entry)
+    diag = await async_get_config_entry_diagnostics(hass, config_entry)
+
+    assert diag["entry"][CONF_MASTER_PASSWORD] == "**REDACTED**"
+    assert diag["data"]["txt113"].strip() == "5.4"
+
+
+async def test_options_change_modules(
+    hass: HomeAssistant, mock_device, config_entry, entity_registry: er.EntityRegistry
+) -> None:
+    await _setup(hass, config_entry)
+    assert hass.states.get("sensor.iq_r23_fireplace")
+
+    result = await hass.config_entries.options.async_init(config_entry.entry_id)
+    result = await hass.config_entries.options.async_configure(
+        result["flow_id"], {CONF_MODULES: ["tank", "pool"]}
+    )
+    await hass.async_block_till_done()
+
+    assert config_entry.options[CONF_MODULES] == ["tank", "pool"]
+    assert entity_registry.async_get("sensor.iq_r23_fireplace") is None
+    assert hass.states.get("sensor.iq_r23_pool_filtration").state == "unknown"
+    assert hass.states.get("sensor.iq_r23_tank_upper").state == "64.0"
