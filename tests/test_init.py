@@ -179,3 +179,18 @@ async def test_options_change_modules(
     assert entity_registry.async_get("sensor.iq_r23_fireplace") is None
     assert hass.states.get("sensor.iq_r23_pool_filtration").state == "unknown"
     assert hass.states.get("sensor.iq_r23_tank_upper").state == "64.0"
+
+
+async def test_remove_stale_device(
+    hass: HomeAssistant, mock_device, config_entry, device_registry: dr.DeviceRegistry
+) -> None:
+    from custom_components.iqr23 import async_remove_config_entry_device
+
+    await _setup(hass, config_entry)
+    active = device_registry.async_get_device(identifiers={(DOMAIN, config_entry.entry_id)})
+    stale = device_registry.async_get_or_create(
+        config_entry_id=config_entry.entry_id, identifiers={(DOMAIN, "")}
+    )
+
+    assert not await async_remove_config_entry_device(hass, config_entry, active)
+    assert await async_remove_config_entry_device(hass, config_entry, stale)
