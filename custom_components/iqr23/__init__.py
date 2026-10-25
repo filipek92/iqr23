@@ -79,8 +79,9 @@ async def async_migrate_entry(hass: HomeAssistant, entry: IQR23ConfigEntry) -> b
 
         @callback
         def _migrate_unique_id(entity: er.RegistryEntry) -> dict[str, str] | None:
-            if not entity.unique_id.startswith(f"{DOMAIN}_"):
+            if entity.unique_id.startswith(f"{entry.entry_id}_"):
                 return None
+            # Releases before 1.1.2 created binary sensors without the domain prefix.
             key = entity.unique_id.removeprefix(f"{DOMAIN}_")
             key = LEGACY_RENAMED_KEYS.get(key, key)
             return {"new_unique_id": f"{entry.entry_id}_{key}"}
@@ -89,12 +90,11 @@ async def async_migrate_entry(hass: HomeAssistant, entry: IQR23ConfigEntry) -> b
 
         # 1.x identified the device by its host URL.
         device_registry = dr.async_get(hass)
-        if device := device_registry.async_get_device(
-            identifiers={(DOMAIN, entry.data[CONF_HOST])}
-        ):
-            device_registry.async_update_device(
-                device.id, new_identifiers={(DOMAIN, entry.entry_id)}
-            )
+        for device in dr.async_entries_for_config_entry(device_registry, entry.entry_id):
+            if (DOMAIN, entry.data[CONF_HOST]) in device.identifiers:
+                device_registry.async_update_device(
+                    device.id, new_identifiers={(DOMAIN, entry.entry_id)}
+                )
 
         if removed_switches:
             ir.async_create_issue(

@@ -111,8 +111,13 @@ async def test_migrate_from_v1(
         suggested_object_id="iqr23_outdoortemp",
     )
     entity_registry.async_update_entity(temp.entity_id, name="Venkovní teplota garáž")
+    # Releases before 1.1.2 created binary sensors without the domain prefix.
+    tariff = entity_registry.async_get_or_create(
+        "binary_sensor", DOMAIN, "lowTariff", config_entry=entry,
+        suggested_object_id="iqr23_lowtariff",
+    )
     solar = entity_registry.async_get_or_create(
-        "binary_sensor", DOMAIN, "iqr23_solarCirculation", config_entry=entry,
+        "binary_sensor", DOMAIN, "solarCirculation", config_entry=entry,
         suggested_object_id="iqr23_solarcirculation",
     )
     switch = entity_registry.async_get_or_create(
@@ -131,6 +136,10 @@ async def test_migrate_from_v1(
     assert hass.states.get("sensor.iqr23_outdoortemp").state == "5.4"
 
     assert entity_registry.async_get(solar.entity_id).unique_id == f"{entry.entry_id}_SOL_running"
+    assert hass.states.get(tariff.entity_id).state == "on"
+    # No duplicates were created next to the migrated entities.
+    assert hass.states.get("binary_sensor.iq_r23_low_tariff") is None
+    assert hass.states.get("binary_sensor.iq_r23_sol_output") is None
     # Modules are detected from connected sensors: no pool and cooling here.
     assert entry.options[CONF_MODULES] == [
         "tank", "circuit_1", "circuit_2", "fireplace", "solar"
