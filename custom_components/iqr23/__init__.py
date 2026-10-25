@@ -64,6 +64,13 @@ async def async_unload_entry(hass: HomeAssistant, entry: IQR23ConfigEntry) -> bo
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
 
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, entry: IQR23ConfigEntry, device: dr.DeviceEntry
+) -> bool:
+    """Allow removing devices that no longer belong to the controller."""
+    return (DOMAIN, entry.entry_id) not in device.identifiers
+
+
 async def async_migrate_entry(hass: HomeAssistant, entry: IQR23ConfigEntry) -> bool:
     """Migrate 1.x entries: scope unique IDs per entry and replace switches by selects."""
     if entry.version > 2:
