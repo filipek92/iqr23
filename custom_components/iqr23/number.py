@@ -10,7 +10,7 @@ from homeassistant.components.number import (
     NumberEntityDescription,
     NumberMode,
 )
-from homeassistant.const import PERCENTAGE, Platform, UnitOfTemperature
+from homeassistant.const import PERCENTAGE, EntityCategory, Platform, UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
@@ -33,6 +33,10 @@ class IQR23NumberEntityDescription(NumberEntityDescription):
     module: Module
 
 
+# Setpoints adjusted in everyday use; the rest are tuned once when commissioning the system.
+CONTROLS = {"tank_base", "circuit_1_shift", "circuit_2_shift", "pool_on", "pool_off"}
+
+
 def _number(
     key: str,
     module: Module,
@@ -50,6 +54,7 @@ def _number(
         native_step=setpoint.step,
         native_unit_of_measurement=unit,
         device_class=device_class,
+        entity_category=None if key in CONTROLS else EntityCategory.CONFIG,
         mode=NumberMode.BOX,
     )
 

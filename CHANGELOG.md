@@ -9,6 +9,9 @@
   so the integration presses them until the value is reached, verifies it and saves it.
 
 ### Changed
+- Setpoint numbers tuned once at commissioning (seasonal S1/S2, heating curve, setback, flow limits,
+  fireplace, solar, cooling) are configuration entities; tank base temperature, curve shifts and
+  pool temperatures stay as controls.
 - Entity keys (unique ID suffixes) were unified to snake_case, e.g. `watertankUpper` → `tank_upper`,
   `lowerFloorMixing` → `circuit_1_mixing`, `SP1_mode` → `output_sp1_mode`. Existing entries are migrated
   automatically; entity IDs, custom names and history are kept.
