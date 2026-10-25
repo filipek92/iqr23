@@ -6,6 +6,13 @@
       "low_tariff": { "default": "mdi:transmission-tower" },
       "ups": { "default": "mdi:power-plug-battery" }
     },
+    "number": {
+      "circuit_1_curve": { "default": "mdi:chart-bell-curve-cumulative" },
+      "circuit_1_setback": { "default": "mdi:sleep" },
+      "circuit_2_curve": { "default": "mdi:chart-bell-curve-cumulative" },
+      "circuit_2_setback": { "default": "mdi:sleep" },
+      "solar_difference": { "default": "mdi:sun-thermometer" }
+    },
     "select": {
       "output_mode": {
         "default": "mdi:electric-switch",

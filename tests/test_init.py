@@ -2,9 +2,12 @@
 
 import re
 
+import pytest
+
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import (
     device_registry as dr,
 )
@@ -57,6 +60,11 @@ async def test_setup_creates_entities(
     assert sp1.attributes["options"] == ["auto", "auto_r", "on", "off"]
     assert hass.states.get("select.iq_r23_krb_mode").state == "auto"
 
+    summer = hass.states.get("number.iq_r23_tank_lower_summer")
+    assert summer.state == "10"
+    assert (summer.attributes["min"], summer.attributes["max"]) == (10, 85)
+    assert hass.states.get("number.iq_r23_circuit_to1_curve_shift").state == "-6"
+
     # Modules not selected in options are not created at all.
     assert entity_registry.async_get("sensor.iq_r23_pool_filtration") is None
     np2 = entity_registry.async_get("binary_sensor.iq_r23_input_np2")
@@ -90,6 +98,24 @@ async def test_select_option_presses_mode_button(
 
     urls = [str(url) for _, url, _, _ in mock_device.mock_calls]
     assert f"{HOST}/t_but.cgi?but=300" in urls
+    assert f"{HOST}/t_but.cgi?but=200" in urls
+
+
+async def test_set_number_presses_buttons(hass: HomeAssistant, mock_device, config_entry) -> None:
+    await _setup(hass, config_entry)
+    mock_device.mock_calls.clear()
+
+    # The recorded XML never changes, so the controller appears to ignore the presses.
+    with pytest.raises(HomeAssistantError, match="stopped at 10 instead of 12"):
+        await hass.services.async_call(
+            "number",
+            "set_value",
+            {"entity_id": "number.iq_r23_tank_lower_summer", "value": 12},
+            blocking=True,
+        )
+
+    urls = [str(url) for _, url, _, _ in mock_device.mock_calls]
+    assert urls.count(f"{HOST}/t_but.cgi?but=113") == 4
     assert f"{HOST}/t_but.cgi?but=200" in urls
 
 

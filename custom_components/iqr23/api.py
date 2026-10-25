@@ -7,6 +7,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -18,7 +20,19 @@ _LOGGER = logging.getLogger(__name__)
 REQUEST_TIMEOUT = aiohttp.ClientTimeout(total=10)
 
 # XML endpoints polled on every refresh; their contents are merged into one flat dict.
-DATA_FILES = ("data", "data_i_all", "data_t_zas", "data_n_txo", "data_n_tix")
+DATA_FILES = (
+    "data",
+    "data_i_all",
+    "data_t_zas",
+    "data_n_txo",
+    "data_n_tix",
+    "data_t_ek1",
+    "data_t_ek2",
+    "data_t_krb",
+    "data_t_sol",
+    "data_t_baz",
+    "data_t_chl",
+)
 
 SAVE_BUTTON = 200
 EMPTY_TEMPERATURES = {"--.-", "-.-", "--", "-"}
@@ -82,6 +96,59 @@ DIGITAL_OUTPUTS: dict[str, DigitalOutput] = {
         for index, name in enumerate(
             ("SP1", "SP2", "OVR", "KRB", "SOL", "TVC", "TO1", "TO2", "TCC", "T/C", "H/D", "STO")
         )
+    )
+}
+
+
+@dataclass(frozen=True, slots=True)
+class Setpoint:
+    """Setting adjusted by the web UI -/+ buttons, one `step` per press.
+
+    `file` is the XML file holding `value_key`. Presses beyond `min_value`..`max_value`
+    are silently ignored by the controller. Some limits also follow other settings,
+    e.g. a minimum stays below its maximum, so the full range is not always reachable.
+    """
+
+    key: str
+    file: str
+    value_key: str
+    minus_button: int
+    plus_button: int
+    min_value: int
+    max_value: int
+    step: int = 1
+
+
+# Limits measured on the controller (firmware iQR23L08b); coupled pairs list the outer bounds.
+SETPOINTS: dict[str, Setpoint] = {
+    setpoint.key: setpoint
+    for setpoint in (
+        Setpoint("tank_base", "data_t_zas", "txt503", 100, 101, 10, 85),
+        Setpoint("tank_upper_spring", "data_t_zas", "txt510", 102, 103, 10, 80),
+        Setpoint("tank_upper_summer", "data_t_zas", "txt511", 104, 105, 10, 80),
+        Setpoint("tank_upper_autumn", "data_t_zas", "txt512", 106, 107, 10, 80),
+        Setpoint("tank_upper_winter", "data_t_zas", "txt513", 108, 109, 10, 80),
+        Setpoint("tank_lower_spring", "data_t_zas", "txt514", 110, 111, 10, 85),
+        Setpoint("tank_lower_summer", "data_t_zas", "txt515", 112, 113, 10, 85),
+        Setpoint("tank_lower_autumn", "data_t_zas", "txt516", 114, 115, 10, 85),
+        Setpoint("tank_lower_winter", "data_t_zas", "txt517", 116, 117, 10, 85),
+        Setpoint("circuit_1_curve", "data_t_ek1", "txt574", 141, 142, 1, 60),
+        Setpoint("circuit_1_setback", "data_t_ek1", "txt570", 125, 126, 1, 50),
+        Setpoint("circuit_1_shift", "data_t_ek1", "txt575", 143, 144, -9, 9),
+        Setpoint("circuit_1_min", "data_t_ek1", "txt572", 137, 138, 10, 79),
+        Setpoint("circuit_1_max", "data_t_ek1", "txt573", 139, 140, 11, 80),
+        Setpoint("circuit_2_curve", "data_t_ek2", "txt584", 171, 172, 1, 60),
+        Setpoint("circuit_2_setback", "data_t_ek2", "txt580", 155, 156, 1, 50),
+        Setpoint("circuit_2_shift", "data_t_ek2", "txt585", 173, 174, -9, 9),
+        Setpoint("circuit_2_min", "data_t_ek2", "txt582", 167, 168, 10, 79),
+        Setpoint("circuit_2_max", "data_t_ek2", "txt583", 169, 170, 11, 80),
+        Setpoint("fireplace_start", "data_t_krb", "txt596", 441, 442, 50, 80),
+        Setpoint("fireplace_hysteresis", "data_t_krb", "txt597", 443, 444, 5, 20),
+        Setpoint("solar_difference", "data_t_sol", "txt595", 425, 426, 5, 30),
+        Setpoint("pool_on", "data_t_baz", "txt195", 480, 481, 10, 37),
+        Setpoint("pool_off", "data_t_baz", "txt196", 452, 453, 11, 38),
+        Setpoint("cooling_on", "data_t_chl", "txt194", 180, 181, 6, 40),
+        Setpoint("cooling_off", "data_t_chl", "txt193", 182, 183, 5, 39),
     )
 }
 
@@ -195,17 +262,53 @@ class IQR23Client:
         except (aiohttp.ClientError, TimeoutError) as err:
             raise IQR23ConnectionError(f"Button {button} press failed: {err}") from err
 
+    @asynccontextmanager
+    async def _service_mode(self) -> AsyncIterator[None]:
+        """Log in with the master password; buttons are ignored without it."""
+        await self._login(self._master_password)
+        try:
+            yield
+        finally:
+            # Always log out, otherwise the controller stays in service mode.
+            try:
+                await self._login("")
+            except IQR23Error as err:
+                _LOGGER.warning("Logout from %s failed: %s", self.host, err)
+
     async def async_set_output_mode(self, output_key: str, mode: OutputMode) -> None:
         """Switch a digital output to the given mode and persist the setting."""
         button = DIGITAL_OUTPUTS[output_key].mode_buttons[OutputMode(mode)]
-        async with self._lock:
-            await self._login(self._master_password)
-            try:
-                await self._press_button(button)
-                await self._press_button(SAVE_BUTTON)
-            finally:
-                # Always log out, otherwise the controller stays in service mode.
-                try:
-                    await self._login("")
-                except IQR23Error as err:
-                    _LOGGER.warning("Logout from %s failed: %s", self.host, err)
+        async with self._lock, self._service_mode():
+            await self._press_button(button)
+            await self._press_button(SAVE_BUTTON)
+
+    async def _get_setpoint(self, setpoint: Setpoint) -> int:
+        data = await self._get_xml(setpoint.file)
+        try:
+            return int(data[setpoint.value_key])
+        except (KeyError, TypeError, ValueError) as err:
+            raise IQR23ConnectionError(f"Missing value of {setpoint.key}") from err
+
+    async def async_set_setpoint(self, key: str, value: int) -> None:
+        """Press -/+ until the setpoint reaches the value, then persist it.
+
+        The controller only offers relative buttons, so the result is read back;
+        a second round makes up for presses the controller dropped.
+        """
+        setpoint = SETPOINTS[key]
+        if not setpoint.min_value <= value <= setpoint.max_value:
+            raise ValueError(f"{value} is out of range of {key}")
+        async with self._lock, self._service_mode():
+            for _ in range(2):
+                current = await self._get_setpoint(setpoint)
+                presses = (value - current) // setpoint.step
+                if not presses:
+                    break
+                button = setpoint.plus_button if presses > 0 else setpoint.minus_button
+                for _ in range(abs(presses)):
+                    await self._press_button(button)
+            current = await self._get_setpoint(setpoint)
+            # Persist whatever was reached, so the controller does not revert on restart.
+            await self._press_button(SAVE_BUTTON)
+        if current != value:
+            raise IQR23Error(f"{key} stopped at {current} instead of {value}")

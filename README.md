@@ -23,7 +23,7 @@ made by iQ vytápění s.r.o. for iQ TAT storage tanks
 
 1. Go to Settings → Devices & Services → Add Integration → **iQ R23**
 2. Enter the IP address or hostname of the controller
-3. Enter the service (master) password, which is needed to change output modes (factory default is prefilled)
+3. Enter the service (master) password, which is needed to change output modes and setpoints (factory default is prefilled)
 
 The address and password can be changed later via **Reconfigure**.
 
@@ -40,6 +40,16 @@ The selection can be changed in the integration **Options**; entities of other m
   problem sensors (safety thermostat, pressure, overcurrent) and the actual state of every output.
   Digital inputs (DI) are available as diagnostic entities, disabled by default.
 - **Selects** – operating mode of each output: `Auto`, `AutoR` (reverse auto), `On`, `Off`.
+- **Numbers** – setpoints from the web interface temperature page: tank base temperature and
+  seasonal S1/S2 targets, heating curve, night setback, curve shift and flow limits of TO1/TO2,
+  fireplace, solar, pool and cooling thresholds.
+
+The controller has no way to set a value directly, only the -/+ buttons of its web interface.
+Setting a number logs in with the master password, presses the button as many times as needed,
+reads the value back and saves it to the controller's permanent memory. When the controller
+refuses to go further, the reached value is kept and an error is shown. Some limits follow other
+settings: a minimum flow or switch-on temperature cannot cross its maximum or switch-off pair,
+and S1 cannot go below the tank base temperature.
 
 Example – return the SP1 coil to automatic mode:
 
