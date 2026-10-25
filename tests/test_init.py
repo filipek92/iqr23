@@ -5,7 +5,7 @@ import re
 import pytest
 
 from homeassistant.config_entries import ConfigEntryState
-from homeassistant.const import CONF_HOST
+from homeassistant.const import CONF_HOST, EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import (
@@ -64,6 +64,11 @@ async def test_setup_creates_entities(
     assert summer.state == "10"
     assert (summer.attributes["min"], summer.attributes["max"]) == (10, 85)
     assert hass.states.get("number.iq_r23_circuit_to1_curve_shift").state == "-6"
+    assert entity_registry.async_get("number.iq_r23_tank_base_temperature").entity_category is None
+    assert (
+        entity_registry.async_get("number.iq_r23_tank_lower_summer").entity_category
+        is EntityCategory.CONFIG
+    )
 
     # Modules not selected in options are not created at all.
     assert entity_registry.async_get("sensor.iq_r23_pool_filtration") is None
