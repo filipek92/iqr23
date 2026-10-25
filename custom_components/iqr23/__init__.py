@@ -2,18 +2,40 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from homeassistant.components.frontend import add_extra_js_url
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.typing import ConfigType
+from homeassistant.loader import async_get_integration
 
 from .api import IQR23Client
-from .const import CONF_MASTER_PASSWORD, CONF_MODULES, DOMAIN, PLATFORMS
+from .const import CARD_URL, CONF_MASTER_PASSWORD, CONF_MODULES, DOMAIN, PLATFORMS
 from .coordinator import IQR23ConfigEntry, IQR23Coordinator
 from .migration import async_migrate_entry
 from .modules import detect_modules
 
 __all__ = ["async_migrate_entry"]
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+CARD_PATH = Path(__file__).parent / "frontend" / "iqr23-card.js"
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Serve the bundled Lovelace card."""
+    integration = await async_get_integration(hass, DOMAIN)
+    await hass.http.async_register_static_paths(
+        [StaticPathConfig(CARD_URL, str(CARD_PATH), cache_headers=True)]
+    )
+    # The version query makes browsers fetch the card again after an update.
+    add_extra_js_url(hass, f"{CARD_URL}?v={integration.version}")
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: IQR23ConfigEntry) -> bool:

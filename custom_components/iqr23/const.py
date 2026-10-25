@@ -8,6 +8,8 @@ DOMAIN = "iqr23"
 MANUFACTURER = "iQ vytápění"
 MODEL = "iQ R23"
 
+CARD_URL = f"/{DOMAIN}/iqr23-card.js"
+
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.NUMBER, Platform.SELECT, Platform.SENSOR]
 
 CONF_FIRMWARE_VERSION = "firmware_version"
