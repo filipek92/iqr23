@@ -69,22 +69,22 @@
       "tank_lower_heating_time": {
         "name": "SP2 heating time"
       },
-      "floor_lower": {
+      "circuit_1": {
         "name": "Circuit TO1"
       },
-      "floor_lower_target": {
+      "circuit_1_target": {
         "name": "Circuit TO1 target"
       },
-      "floor_lower_mixing": {
+      "circuit_1_mixing": {
         "name": "Circuit TO1 mixing valve"
       },
-      "floor_upper": {
+      "circuit_2": {
         "name": "Circuit TO2"
       },
-      "floor_upper_target": {
+      "circuit_2_target": {
         "name": "Circuit TO2 target"
       },
-      "floor_upper_mixing": {
+      "circuit_2_mixing": {
         "name": "Circuit TO2 mixing valve"
       },
       "fireplace": {
@@ -96,7 +96,7 @@
       "cooling": {
         "name": "Cooling"
       },
-      "pool_filter": {
+      "pool_filtration": {
         "name": "Pool filtration"
       },
       "pool_exchanger": {
@@ -119,31 +119,31 @@
       "safety_thermostat": {
         "name": "Safety thermostat 95 °C"
       },
-      "pressure": {
+      "system_pressure": {
         "name": "System pressure"
       },
-      "overcurrent_sp1": {
+      "tank_upper_overcurrent": {
         "name": "SP1 overcurrent"
       },
-      "overcurrent_sp2": {
+      "tank_lower_overcurrent": {
         "name": "SP2 overcurrent"
       },
-      "floor_lower_demand": {
+      "circuit_1_demand": {
         "name": "Circuit TO1 thermostat demand"
       },
-      "floor_lower_setback": {
+      "circuit_1_setback": {
         "name": "Circuit TO1 setback"
       },
-      "floor_lower_pump": {
+      "circuit_1_pump": {
         "name": "Circuit TO1 pump"
       },
-      "floor_upper_demand": {
+      "circuit_2_demand": {
         "name": "Circuit TO2 thermostat demand"
       },
-      "floor_upper_setback": {
+      "circuit_2_setback": {
         "name": "Circuit TO2 setback"
       },
-      "floor_upper_pump": {
+      "circuit_2_pump": {
         "name": "Circuit TO2 pump"
       },
       "fireplace_pump": {

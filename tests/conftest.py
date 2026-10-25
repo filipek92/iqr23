@@ -8,11 +8,11 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMocker
 
 from custom_components.iqr23.api import DATA_FILES
-from custom_components.iqr23.const import CONF_MASTER_PASSWORD, CONF_VERSION, DOMAIN
+from custom_components.iqr23.const import CONF_FIRMWARE_VERSION, CONF_MASTER_PASSWORD, DOMAIN
 
 FIXTURES_DIR = Path(__file__).parent / "fixtures" / "iqr23_10_6_2_20"
 HOST = "http://10.6.2.20"
-VERSION = "iQR23L08b:2018/03/06  BD: Apr 14 2018 08:51:08"
+FIRMWARE_VERSION = "iQR23L08b:2018/03/06  BD: Apr 14 2018 08:51:08"
 
 
 @pytest.fixture(autouse=True)
@@ -40,7 +40,8 @@ def config_entry() -> MockConfigEntry:
     return MockConfigEntry(
         domain=DOMAIN,
         version=2,
+        minor_version=2,
         unique_id=HOST,
         title=HOST,
-        data={CONF_HOST: HOST, CONF_MASTER_PASSWORD: "secret", CONF_VERSION: VERSION},
+        data={CONF_HOST: HOST, CONF_MASTER_PASSWORD: "secret", CONF_FIRMWARE_VERSION: FIRMWARE_VERSION},
     )

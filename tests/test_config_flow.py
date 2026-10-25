@@ -6,13 +6,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
 
 from custom_components.iqr23.const import (
+    CONF_FIRMWARE_VERSION,
     CONF_MASTER_PASSWORD,
     CONF_MODULES,
-    CONF_VERSION,
     DOMAIN,
 )
 
-from .conftest import HOST, VERSION
+from .conftest import HOST, FIRMWARE_VERSION
 
 USER_INPUT = {CONF_HOST: "10.6.2.20", CONF_MASTER_PASSWORD: "secret"}
 
@@ -28,7 +28,7 @@ async def test_user_flow_creates_entry(hass: HomeAssistant, mock_device) -> None
     assert result["data"] == {
         CONF_HOST: HOST,
         CONF_MASTER_PASSWORD: "secret",
-        CONF_VERSION: VERSION,
+        CONF_FIRMWARE_VERSION: FIRMWARE_VERSION,
     }
     assert result["result"].unique_id == HOST
     assert result["options"] == {

@@ -33,12 +33,12 @@ class IQR23SensorEntityDescription(SensorEntityDescription):
 
 
 def _temperature(
-    key: str, raw_key: str, translation_key: str, module: Module | None = None
+    key: str, raw_key: str, module: Module | None = None
 ) -> IQR23SensorEntityDescription:
     return IQR23SensorEntityDescription(
         key=key,
         raw_key=raw_key,
-        translation_key=translation_key,
+        translation_key=key,
         device_class=SensorDeviceClass.TEMPERATURE,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=UnitOfTemperature.CELSIUS,
@@ -46,13 +46,11 @@ def _temperature(
     )
 
 
-def _heating_time(
-    key: str, raw_key: str, translation_key: str, module: Module
-) -> IQR23SensorEntityDescription:
+def _heating_time(key: str, raw_key: str, module: Module) -> IQR23SensorEntityDescription:
     return IQR23SensorEntityDescription(
         key=key,
         raw_key=raw_key,
-        translation_key=translation_key,
+        translation_key=key,
         module=module,
         device_class=SensorDeviceClass.DURATION,
         state_class=SensorStateClass.TOTAL_INCREASING,
@@ -61,13 +59,11 @@ def _heating_time(
     )
 
 
-def _mixing(
-    key: str, raw_key: str, translation_key: str, module: Module
-) -> IQR23SensorEntityDescription:
+def _mixing(key: str, raw_key: str, module: Module) -> IQR23SensorEntityDescription:
     return IQR23SensorEntityDescription(
         key=key,
         raw_key=raw_key,
-        translation_key=translation_key,
+        translation_key=key,
         module=module,
         state_class=SensorStateClass.MEASUREMENT,
         native_unit_of_measurement=PERCENTAGE,
@@ -75,32 +71,31 @@ def _mixing(
     )
 
 
-# Keys are kept from 1.x so that existing entities keep their unique IDs.
 SENSORS: tuple[IQR23SensorEntityDescription, ...] = (
-    _temperature("outdoorTemp", "txt113", "outdoor_temperature"),
-    _temperature("outdoorTempMin", "txt714", "outdoor_temperature_min"),
-    _temperature("outdoorTempMax", "txt715", "outdoor_temperature_max"),
-    _temperature("outdoorTempMean", "txt713", "outdoor_temperature_mean"),
-    _temperature("watertankUpper", "txt101", "tank_upper", Module.TANK),
-    _temperature("watertankUpperRequest", "txt501", "tank_upper_target", Module.TANK),
-    _heating_time("watertankUpperHeatingTime", "txt740", "tank_upper_heating_time", Module.TANK),
-    _temperature("watertankMiddle", "txt102", "tank_middle", Module.TANK),
-    _temperature("watertankLower", "txt106", "tank_lower", Module.TANK),
-    _temperature("watertankLowerRequest", "txt502", "tank_lower_target", Module.TANK),
-    _heating_time("watertankLowerHeatingTime", "txt741", "tank_lower_heating_time", Module.TANK),
-    _temperature("lowerFloor", "txt111", "floor_lower", Module.CIRCUIT_1),
-    _temperature("lowerFloorRequest", "txt520", "floor_lower_target", Module.CIRCUIT_1),
-    _mixing("lowerFloorMixing", "txt521", "floor_lower_mixing", Module.CIRCUIT_1),
-    _temperature("upperFloor", "txt112", "floor_upper", Module.CIRCUIT_2),
-    _temperature("upperFloorRequest", "txt526", "floor_upper_target", Module.CIRCUIT_2),
-    _mixing("upperFloorMixing", "txt527", "floor_upper_mixing", Module.CIRCUIT_2),
-    _temperature("fireplace", "txt104", "fireplace", Module.FIREPLACE),
-    _temperature("solarTemperature", "txt105", "solar", Module.SOLAR),
-    _temperature("coolingTankTemperature", "txt109", "cooling", Module.COOLING),
-    _temperature("poolTemperatureFilter", "txt107", "pool_filter", Module.POOL),
-    _temperature("poolTemperatureExchanger", "txt108", "pool_exchanger", Module.POOL),
-    _temperature("poolTemperatureMin", "txt730", "pool_min", Module.POOL),
-    _temperature("poolTemperatureMax", "txt731", "pool_max", Module.POOL),
+    _temperature("outdoor_temperature", "txt113"),
+    _temperature("outdoor_temperature_min", "txt714"),
+    _temperature("outdoor_temperature_max", "txt715"),
+    _temperature("outdoor_temperature_mean", "txt713"),
+    _temperature("tank_upper", "txt101", Module.TANK),
+    _temperature("tank_upper_target", "txt501", Module.TANK),
+    _heating_time("tank_upper_heating_time", "txt740", Module.TANK),
+    _temperature("tank_middle", "txt102", Module.TANK),
+    _temperature("tank_lower", "txt106", Module.TANK),
+    _temperature("tank_lower_target", "txt502", Module.TANK),
+    _heating_time("tank_lower_heating_time", "txt741", Module.TANK),
+    _temperature("circuit_1", "txt111", Module.CIRCUIT_1),
+    _temperature("circuit_1_target", "txt520", Module.CIRCUIT_1),
+    _mixing("circuit_1_mixing", "txt521", Module.CIRCUIT_1),
+    _temperature("circuit_2", "txt112", Module.CIRCUIT_2),
+    _temperature("circuit_2_target", "txt526", Module.CIRCUIT_2),
+    _mixing("circuit_2_mixing", "txt527", Module.CIRCUIT_2),
+    _temperature("fireplace", "txt104", Module.FIREPLACE),
+    _temperature("solar", "txt105", Module.SOLAR),
+    _temperature("cooling", "txt109", Module.COOLING),
+    _temperature("pool_filtration", "txt107", Module.POOL),
+    _temperature("pool_exchanger", "txt108", Module.POOL),
+    _temperature("pool_min", "txt730", Module.POOL),
+    _temperature("pool_max", "txt731", Module.POOL),
 )
 
 

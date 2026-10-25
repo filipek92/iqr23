@@ -2,7 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
 
-This Home Assistant custom integration provides connectivity with iQ R23 heating controllers, allowing you to monitor and control your heating system directly from Home Assistant.
+This Home Assistant custom integration provides connectivity with iQ R23 heating controllers made by iQ vytápění, allowing you to monitor and control your heating system directly from Home Assistant.
 
 ## What you get
 

@@ -1,5 +1,7 @@
 """Tests of setup, entities and migration."""
 
+import re
+
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.const import CONF_HOST
 from homeassistant.core import HomeAssistant
@@ -16,13 +18,13 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.iqr23.api import DATA_FILES
 from custom_components.iqr23.const import (
+    CONF_FIRMWARE_VERSION,
     CONF_MASTER_PASSWORD,
     CONF_MODULES,
-    CONF_VERSION,
     DOMAIN,
 )
 
-from .conftest import HOST, VERSION
+from .conftest import HOST, FIRMWARE_VERSION
 
 
 async def _setup(hass: HomeAssistant, entry: MockConfigEntry) -> None:
@@ -32,7 +34,11 @@ async def _setup(hass: HomeAssistant, entry: MockConfigEntry) -> None:
 
 
 async def test_setup_creates_entities(
-    hass: HomeAssistant, mock_device, config_entry, entity_registry: er.EntityRegistry
+    hass: HomeAssistant,
+    mock_device,
+    config_entry,
+    entity_registry: er.EntityRegistry,
+    device_registry: dr.DeviceRegistry,
 ) -> None:
     await _setup(hass, config_entry)
     assert config_entry.state is ConfigEntryState.LOADED
@@ -55,6 +61,15 @@ async def test_setup_creates_entities(
     assert entity_registry.async_get("sensor.iq_r23_pool_filtration") is None
     np2 = entity_registry.async_get("binary_sensor.iq_r23_input_np2")
     assert np2.disabled_by is er.RegistryEntryDisabler.INTEGRATION
+
+    device = device_registry.async_get_device(identifiers={(DOMAIN, config_entry.entry_id)})
+    assert (device.manufacturer, device.model, device.name) == ("iQ vytápění", "iQ R23", "iQ R23")
+    assert device.sw_version == FIRMWARE_VERSION
+
+    # Unique IDs are built from stable snake_case keys.
+    for entity in er.async_entries_for_config_entry(entity_registry, config_entry.entry_id):
+        key = entity.unique_id.removeprefix(f"{config_entry.entry_id}_")
+        assert re.fullmatch(r"[a-z0-9_]+", key), entity.unique_id
 
     assert await hass.config_entries.async_unload(config_entry.entry_id)
     assert config_entry.state is ConfigEntryState.NOT_LOADED
@@ -100,7 +115,8 @@ async def test_migrate_from_v1(
         domain=DOMAIN,
         version=1,
         unique_id=HOST,
-        data={CONF_HOST: HOST, CONF_VERSION: VERSION},
+        # 1.x stored the firmware version under "version".
+        data={CONF_HOST: HOST, "version": FIRMWARE_VERSION},
     )
     entry.add_to_hass(hass)
     # Releases before 1.1.2 used an empty device identifier.
@@ -128,15 +144,16 @@ async def test_migrate_from_v1(
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
 
-    assert entry.version == 2
+    assert (entry.version, entry.minor_version) == (2, 2)
     assert entry.data[CONF_MASTER_PASSWORD] == "Servis254"
+    assert entry.data[CONF_FIRMWARE_VERSION] == FIRMWARE_VERSION
 
     migrated = entity_registry.async_get(temp.entity_id)
-    assert migrated.unique_id == f"{entry.entry_id}_outdoorTemp"
+    assert migrated.unique_id == f"{entry.entry_id}_outdoor_temperature"
     assert migrated.name == "Venkovní teplota garáž"
     assert hass.states.get("sensor.iqr23_outdoortemp").state == "5.4"
 
-    assert entity_registry.async_get(solar.entity_id).unique_id == f"{entry.entry_id}_SOL_running"
+    assert entity_registry.async_get(solar.entity_id).unique_id == f"{entry.entry_id}_output_sol"
     assert hass.states.get(tariff.entity_id).state == "on"
     # No duplicates were created next to the migrated entities.
     assert hass.states.get("binary_sensor.iq_r23_low_tariff") is None
@@ -151,6 +168,46 @@ async def test_migrate_from_v1(
     assert device_registry.async_get(device.id).identifiers == {(DOMAIN, entry.entry_id)}
     assert len(dr.async_entries_for_config_entry(device_registry, entry.entry_id)) == 1
     assert entity_registry.async_get(temp.entity_id).device_id == device.id
+
+
+async def test_migrate_from_v2_0(
+    hass: HomeAssistant, mock_device, entity_registry: er.EntityRegistry
+) -> None:
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        version=2,
+        minor_version=1,
+        unique_id=HOST,
+        data={CONF_HOST: HOST, CONF_MASTER_PASSWORD: "secret", "version": FIRMWARE_VERSION},
+        options={CONF_MODULES: ["tank", "circuit_1"]},
+    )
+    entry.add_to_hass(hass)
+    renamed = {
+        ("sensor", "lowerFloorMixing"): "circuit_1_mixing",
+        ("binary_sensor", "watertankPressure"): "system_pressure",
+        ("binary_sensor", "digitalInputLowTariff"): "digital_input_low_tariff",
+        ("binary_sensor", "T/C_running"): "output_tc",
+        ("select", "SP1_mode"): "output_sp1_mode",
+    }
+    entity_ids = {
+        new_key: entity_registry.async_get_or_create(
+            platform, DOMAIN, f"{entry.entry_id}_{old_key}", config_entry=entry
+        ).entity_id
+        for (platform, old_key), new_key in renamed.items()
+    }
+
+    assert await hass.config_entries.async_setup(entry.entry_id)
+    await hass.async_block_till_done()
+
+    assert entry.minor_version == 2
+    assert entry.data[CONF_FIRMWARE_VERSION] == FIRMWARE_VERSION
+    assert "version" not in entry.data
+    for new_key, entity_id in entity_ids.items():
+        assert entity_registry.async_get(entity_id).unique_id == f"{entry.entry_id}_{new_key}"
+    assert hass.states.get(entity_ids["output_sp1_mode"]).state == "off"
+    # No duplicates were created next to the migrated entities.
+    assert hass.states.get("select.iq_r23_sp1_mode") is None
+    assert hass.states.get("binary_sensor.iq_r23_system_pressure") is None
 
 
 async def test_diagnostics_redacts_password(hass: HomeAssistant, mock_device, config_entry) -> None:

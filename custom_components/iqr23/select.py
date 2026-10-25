@@ -36,9 +36,9 @@ class IQR23OutputModeSelect(IQR23Entity, SelectEntity):
 
     def __init__(self, coordinator: IQR23Coordinator, output: DigitalOutput) -> None:
         description = SelectEntityDescription(
-            key=f"{output.key}_mode",
+            key=f"output_{output.key}_mode",
             translation_key="output_mode",
-            translation_placeholders={"output": output.key},
+            translation_placeholders={"output": output.name},
         )
         super().__init__(coordinator, description, output.state_key)
         self._output = output
@@ -57,6 +57,6 @@ class IQR23OutputModeSelect(IQR23Entity, SelectEntity):
             raise HomeAssistantError(
                 translation_domain=DOMAIN,
                 translation_key="set_mode_failed",
-                translation_placeholders={"output": self._output.key, "error": str(err)},
+                translation_placeholders={"output": self._output.name, "error": str(err)},
             ) from err
         await self.coordinator.async_request_refresh()

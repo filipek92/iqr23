@@ -49,23 +49,26 @@ class OutputMode(StrEnum):
 class DigitalOutput:
     """Digital output of the controller.
 
+    `key` is a stable identifier, `name` the label used by the controller.
     `state_key` holds the actual relay state, `mode_keys` map XML keys flagging the
     active mode, `mode_buttons` map modes to web UI buttons switching to them.
     """
 
     key: str
+    name: str
     state_key: str
     mode_keys: dict[str, OutputMode]
     mode_buttons: dict[OutputMode, int]
 
 
-def _output(key: str, index: int) -> DigitalOutput:
+def _output(name: str, index: int) -> DigitalOutput:
     """Build an output definition; the controller numbers them in fixed strides."""
     col = 400 + index * 5
     button = 300 + index * 4
     modes = (OutputMode.AUTO, OutputMode.AUTO_R, OutputMode.ON, OutputMode.OFF)
     return DigitalOutput(
-        key=key,
+        key=name.lower().replace("/", ""),
+        name=name,
         state_key=f"col{col}",
         mode_keys={f"col{col + 1 + i}": mode for i, mode in enumerate(modes)},
         mode_buttons={mode: button + i for i, mode in enumerate(modes)},
@@ -75,8 +78,8 @@ def _output(key: str, index: int) -> DigitalOutput:
 DIGITAL_OUTPUTS: dict[str, DigitalOutput] = {
     output.key: output
     for output in (
-        _output(key, index)
-        for index, key in enumerate(
+        _output(name, index)
+        for index, name in enumerate(
             ("SP1", "SP2", "OVR", "KRB", "SOL", "TVC", "TO1", "TO2", "TCC", "T/C", "H/D", "STO")
         )
     )
@@ -143,7 +146,7 @@ class IQR23Client:
         except (KeyError, TypeError, ValueError) as err:
             raise IQR23ConnectionError(f"Invalid XML from {url}: {err}") from err
 
-    async def async_get_version(self) -> str:
+    async def async_get_firmware_version(self) -> str:
         """Return the firmware version string; used to validate the connection."""
         data = await self._get_xml("data")
         try:
