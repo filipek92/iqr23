@@ -12,7 +12,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import CONF_VERSION, DOMAIN, MANUFACTURER, MODEL
+from .const import CONF_FIRMWARE_VERSION, DOMAIN, MANUFACTURER, MODEL
 from .coordinator import IQR23ConfigEntry, IQR23Coordinator
 from .modules import enabled_modules
 
@@ -59,7 +59,7 @@ class IQR23Entity(CoordinatorEntity[IQR23Coordinator]):
             name=MODEL,
             manufacturer=MANUFACTURER,
             model=MODEL,
-            sw_version=entry.data.get(CONF_VERSION),
+            sw_version=entry.data.get(CONF_FIRMWARE_VERSION),
             configuration_url=coordinator.client.host,
         )
 

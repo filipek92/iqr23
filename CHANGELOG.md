@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- Entity keys (unique ID suffixes) were unified to snake_case, e.g. `watertankUpper` → `tank_upper`,
+  `lowerFloorMixing` → `circuit_1_mixing`, `SP1_mode` → `output_sp1_mode`. Existing entries are migrated
+  automatically; entity IDs, custom names and history are kept.
+- The firmware version is stored as `firmware_version` in the config entry.
+- The device manufacturer is `iQ vytápění` (was `IQ Topeni`).
+
 ## [2.0.0] - 2026-10-25
 
 ### Breaking

@@ -5,14 +5,14 @@ from datetime import timedelta
 from homeassistant.const import Platform
 
 DOMAIN = "iqr23"
-MANUFACTURER = "IQ Topeni"
+MANUFACTURER = "iQ vytápění"
 MODEL = "iQ R23"
 
 PLATFORMS = [Platform.BINARY_SENSOR, Platform.SELECT, Platform.SENSOR]
 
+CONF_FIRMWARE_VERSION = "firmware_version"
 CONF_MASTER_PASSWORD = "master_password"
 CONF_MODULES = "modules"
-CONF_VERSION = "version"
 
 DEFAULT_MASTER_PASSWORD = "Servis254"
 

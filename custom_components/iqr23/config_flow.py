@@ -23,9 +23,9 @@ from homeassistant.helpers.selector import (
 
 from .api import IQR23Client, IQR23ConnectionError, normalize_host
 from .const import (
+    CONF_FIRMWARE_VERSION,
     CONF_MASTER_PASSWORD,
     CONF_MODULES,
-    CONF_VERSION,
     DEFAULT_MASTER_PASSWORD,
     DOMAIN,
 )
@@ -57,6 +57,7 @@ class IQR23ConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for iQ R23."""
 
     VERSION = 2
+    MINOR_VERSION = 2
 
     @staticmethod
     @callback
@@ -72,7 +73,7 @@ class IQR23ConfigFlow(ConfigFlow, domain=DOMAIN):
             async_get_clientsession(self.hass), host, user_input[CONF_MASTER_PASSWORD]
         )
         try:
-            version = await client.async_get_version()
+            firmware_version = await client.async_get_firmware_version()
         except IQR23ConnectionError as err:
             _LOGGER.debug("Cannot connect to %s: %s", host, err)
             errors["base"] = "cannot_connect"
@@ -84,7 +85,7 @@ class IQR23ConfigFlow(ConfigFlow, domain=DOMAIN):
         return {
             CONF_HOST: host,
             CONF_MASTER_PASSWORD: user_input[CONF_MASTER_PASSWORD],
-            CONF_VERSION: version,
+            CONF_FIRMWARE_VERSION: firmware_version,
         }
 
     async def async_step_user(

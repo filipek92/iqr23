@@ -2,36 +2,18 @@
 
 from __future__ import annotations
 
-import logging
-
-from homeassistant.const import CONF_HOST, Platform
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import (
-    device_registry as dr,
-)
-from homeassistant.helpers import (
-    entity_registry as er,
-)
-from homeassistant.helpers import (
-    issue_registry as ir,
-)
+from homeassistant.const import CONF_HOST
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import IQR23Client
-from .const import (
-    CONF_MASTER_PASSWORD,
-    CONF_MODULES,
-    DEFAULT_MASTER_PASSWORD,
-    DOMAIN,
-    PLATFORMS,
-)
+from .const import CONF_MASTER_PASSWORD, CONF_MODULES, DOMAIN, PLATFORMS
 from .coordinator import IQR23ConfigEntry, IQR23Coordinator
+from .migration import async_migrate_entry
 from .modules import detect_modules
 
-_LOGGER = logging.getLogger(__name__)
-
-# 1.x exposed the SOL output state as a standalone binary sensor.
-LEGACY_RENAMED_KEYS = {"solarCirculation": "SOL_running"}
+__all__ = ["async_migrate_entry"]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: IQR23ConfigEntry) -> bool:
@@ -69,56 +51,3 @@ async def async_remove_config_entry_device(
 ) -> bool:
     """Allow removing devices that no longer belong to the controller."""
     return (DOMAIN, entry.entry_id) not in device.identifiers
-
-
-async def async_migrate_entry(hass: HomeAssistant, entry: IQR23ConfigEntry) -> bool:
-    """Migrate 1.x entries: scope unique IDs per entry and replace switches by selects."""
-    if entry.version > 2:
-        return False
-
-    if entry.version == 1:
-        entity_registry = er.async_get(hass)
-        removed_switches: list[str] = []
-        for entity in er.async_entries_for_config_entry(entity_registry, entry.entry_id):
-            if entity.domain == Platform.SWITCH:
-                removed_switches.append(entity.entity_id)
-                entity_registry.async_remove(entity.entity_id)
-
-        @callback
-        def _migrate_unique_id(entity: er.RegistryEntry) -> dict[str, str] | None:
-            if entity.unique_id.startswith(f"{entry.entry_id}_"):
-                return None
-            # Releases before 1.1.2 created binary sensors without the domain prefix.
-            key = entity.unique_id.removeprefix(f"{DOMAIN}_")
-            key = LEGACY_RENAMED_KEYS.get(key, key)
-            return {"new_unique_id": f"{entry.entry_id}_{key}"}
-
-        await er.async_migrate_entries(hass, entry.entry_id, _migrate_unique_id)
-
-        # 1.x identified the device by its host URL (or an empty string in old releases).
-        device_registry = dr.async_get(hass)
-        for device in dr.async_entries_for_config_entry(device_registry, entry.entry_id):
-            if any(domain == DOMAIN for domain, _ in device.identifiers):
-                device_registry.async_update_device(
-                    device.id, new_identifiers={(DOMAIN, entry.entry_id)}
-                )
-
-        if removed_switches:
-            ir.async_create_issue(
-                hass,
-                DOMAIN,
-                "switches_removed",
-                is_fixable=False,
-                severity=ir.IssueSeverity.WARNING,
-                translation_key="switches_removed",
-                translation_placeholders={"entities": ", ".join(removed_switches)},
-            )
-
-        hass.config_entries.async_update_entry(
-            entry,
-            data={CONF_MASTER_PASSWORD: DEFAULT_MASTER_PASSWORD, **entry.data},
-            version=2,
-        )
-        _LOGGER.info("Migrated iQ R23 entry %s to version 2", entry.entry_id)
-
-    return True

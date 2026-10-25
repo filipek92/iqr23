@@ -1,6 +1,8 @@
 # iQ R23 for Home Assistant
 
-This is a Home Assistant integration for the iQ R23 heating controller.
+This is a Home Assistant integration for the [iQ R23](https://www.iqvytapeni.cz/) heating controller
+made by iQ vytápění s.r.o. for iQ TAT storage tanks
+([user manual](https://www.iqvytapeni.cz/files/uploads/ke%20stazeni/manual_iQ_R23_2016_05_17.pdf), Czech).
 
 ## Installation
 

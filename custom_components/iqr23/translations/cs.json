@@ -69,22 +69,22 @@
       "tank_lower_heating_time": {
         "name": "SP2 doba topení"
       },
-      "floor_lower": {
+      "circuit_1": {
         "name": "Okruh TO1"
       },
-      "floor_lower_target": {
+      "circuit_1_target": {
         "name": "Okruh TO1 požadovaná"
       },
-      "floor_lower_mixing": {
+      "circuit_1_mixing": {
         "name": "Okruh TO1 směšovač"
       },
-      "floor_upper": {
+      "circuit_2": {
         "name": "Okruh TO2"
       },
-      "floor_upper_target": {
+      "circuit_2_target": {
         "name": "Okruh TO2 požadovaná"
       },
-      "floor_upper_mixing": {
+      "circuit_2_mixing": {
         "name": "Okruh TO2 směšovač"
       },
       "fireplace": {
@@ -96,7 +96,7 @@
       "cooling": {
         "name": "Chlazení"
       },
-      "pool_filter": {
+      "pool_filtration": {
         "name": "Bazén filtrace"
       },
       "pool_exchanger": {
@@ -119,31 +119,31 @@
       "safety_thermostat": {
         "name": "Bezpečnostní termostat 95 °C"
       },
-      "pressure": {
+      "system_pressure": {
         "name": "Tlak v systému"
       },
-      "overcurrent_sp1": {
+      "tank_upper_overcurrent": {
         "name": "SP1 nadproud"
       },
-      "overcurrent_sp2": {
+      "tank_lower_overcurrent": {
         "name": "SP2 nadproud"
       },
-      "floor_lower_demand": {
+      "circuit_1_demand": {
         "name": "Okruh TO1 požadavek termostatu"
       },
-      "floor_lower_setback": {
+      "circuit_1_setback": {
         "name": "Okruh TO1 útlum"
       },
-      "floor_lower_pump": {
+      "circuit_1_pump": {
         "name": "Okruh TO1 čerpadlo"
       },
-      "floor_upper_demand": {
+      "circuit_2_demand": {
         "name": "Okruh TO2 požadavek termostatu"
       },
-      "floor_upper_setback": {
+      "circuit_2_setback": {
         "name": "Okruh TO2 útlum"
       },
-      "floor_upper_pump": {
+      "circuit_2_pump": {
         "name": "Okruh TO2 čerpadlo"
       },
       "fireplace_pump": {

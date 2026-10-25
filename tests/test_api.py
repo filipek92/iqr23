@@ -18,7 +18,7 @@ from custom_components.iqr23.api import (
     parse_temperature,
 )
 
-from .conftest import HOST, VERSION
+from .conftest import HOST, FIRMWARE_VERSION
 
 
 def test_parsers() -> None:
@@ -34,7 +34,7 @@ def test_normalize_host() -> None:
 
 
 def test_output_definitions_match_controller_layout() -> None:
-    sp1, sto = DIGITAL_OUTPUTS["SP1"], DIGITAL_OUTPUTS["STO"]
+    sp1, sto = DIGITAL_OUTPUTS["sp1"], DIGITAL_OUTPUTS["sto"]
     assert sp1.state_key == "col400"
     assert sp1.mode_keys == {
         "col401": OutputMode.AUTO,
@@ -48,7 +48,7 @@ def test_output_definitions_match_controller_layout() -> None:
 
 
 def test_get_output_mode() -> None:
-    sp1 = DIGITAL_OUTPUTS["SP1"]
+    sp1 = DIGITAL_OUTPUTS["sp1"]
     assert get_output_mode({"col402": "1"}, sp1) is OutputMode.AUTO_R
     assert get_output_mode({"col402": "0"}, sp1) is None
 
@@ -61,7 +61,7 @@ async def test_fetch_merges_all_files(hass: HomeAssistant, mock_device) -> None:
     assert failed == []
     assert data["txt113"].strip() == "5.4"
     assert data["col404"] == "1"
-    assert await client.async_get_version() == VERSION
+    assert await client.async_get_firmware_version() == FIRMWARE_VERSION
 
 
 async def test_fetch_tolerates_partial_failure(
@@ -93,7 +93,7 @@ async def test_fetch_raises_when_everything_fails(
 async def test_set_output_mode_sequence(hass: HomeAssistant, mock_device) -> None:
     client = IQR23Client(async_get_clientsession(hass), HOST, "secret")
 
-    await client.async_set_output_mode("KRB", OutputMode.AUTO)
+    await client.async_set_output_mode("krb", OutputMode.AUTO)
 
     calls = [(method, str(url), data) for method, url, data, _ in mock_device.mock_calls]
     assert calls == [
@@ -112,7 +112,7 @@ async def test_set_output_mode_logs_out_after_failure(
     client = IQR23Client(async_get_clientsession(hass), HOST, "secret")
 
     with pytest.raises(IQR23ConnectionError):
-        await client.async_set_output_mode("SP1", OutputMode.ON)
+        await client.async_set_output_mode("sp1", OutputMode.ON)
 
     method, url, data, _ = aioclient_mock.mock_calls[-1]
     assert (method, data) == ("POST", {"pass": ""})
