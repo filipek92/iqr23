@@ -8,5 +8,5 @@
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/filipek92/iqr23/issues",
   "requirements": ["xmltodict>=0.13.0"],
-  "version": "1.2.2"
+  "version": "2.0.0"
 }
