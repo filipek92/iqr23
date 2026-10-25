@@ -11,6 +11,12 @@ ENDPOINTS=(
   "data_t_zas.xml"
   "data_n_txo.xml"
   "data_n_tix.xml"
+  "data_t_ek1.xml"
+  "data_t_ek2.xml"
+  "data_t_krb.xml"
+  "data_t_sol.xml"
+  "data_t_baz.xml"
+  "data_t_chl.xml"
 )
 
 mkdir -p "$OUT_DIR"

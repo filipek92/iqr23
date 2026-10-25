@@ -9,7 +9,7 @@
         },
         "data_description": {
           "host": "Address of the controller web interface, e.g. 192.168.1.20",
-          "master_password": "Needed to change output modes"
+          "master_password": "Needed to change output modes and setpoints"
         }
       },
       "reconfigure": {
@@ -20,7 +20,7 @@
         },
         "data_description": {
           "host": "Address of the controller web interface, e.g. 192.168.1.20",
-          "master_password": "Needed to change output modes"
+          "master_password": "Needed to change output modes and setpoints"
         }
       }
     },
@@ -177,6 +177,86 @@
         "name": "Input {input}"
       }
     },
+    "number": {
+      "tank_base": {
+        "name": "Tank base temperature"
+      },
+      "tank_upper_spring": {
+        "name": "Tank upper spring"
+      },
+      "tank_upper_summer": {
+        "name": "Tank upper summer"
+      },
+      "tank_upper_autumn": {
+        "name": "Tank upper autumn"
+      },
+      "tank_upper_winter": {
+        "name": "Tank upper winter"
+      },
+      "tank_lower_spring": {
+        "name": "Tank lower spring"
+      },
+      "tank_lower_summer": {
+        "name": "Tank lower summer"
+      },
+      "tank_lower_autumn": {
+        "name": "Tank lower autumn"
+      },
+      "tank_lower_winter": {
+        "name": "Tank lower winter"
+      },
+      "circuit_1_curve": {
+        "name": "Circuit TO1 heating curve"
+      },
+      "circuit_1_setback": {
+        "name": "Circuit TO1 night setback"
+      },
+      "circuit_1_shift": {
+        "name": "Circuit TO1 curve shift"
+      },
+      "circuit_1_min": {
+        "name": "Circuit TO1 minimum flow"
+      },
+      "circuit_1_max": {
+        "name": "Circuit TO1 maximum flow"
+      },
+      "circuit_2_curve": {
+        "name": "Circuit TO2 heating curve"
+      },
+      "circuit_2_setback": {
+        "name": "Circuit TO2 night setback"
+      },
+      "circuit_2_shift": {
+        "name": "Circuit TO2 curve shift"
+      },
+      "circuit_2_min": {
+        "name": "Circuit TO2 minimum flow"
+      },
+      "circuit_2_max": {
+        "name": "Circuit TO2 maximum flow"
+      },
+      "fireplace_start": {
+        "name": "Fireplace pump start"
+      },
+      "fireplace_hysteresis": {
+        "name": "Fireplace hysteresis"
+      },
+      "solar_difference": {
+        "name": "Solar temperature difference"
+      },
+      "pool_on": {
+        "name": "Pool heating on"
+      },
+      "pool_off": {
+        "name": "Pool heating off"
+      },
+      "cooling_on": {
+        "name": "Cooling on"
+      },
+      "cooling_off": {
+        "name": "Cooling off"
+      }
+    },
     "select": {
       "output_mode": {
         "name": "{output} mode",
@@ -192,6 +272,9 @@
   "exceptions": {
     "set_mode_failed": {
       "message": "Failed to set mode of output {output}: {error}"
+    },
+    "set_setpoint_failed": {
+      "message": "Failed to set value: {error}"
     }
   },
   "issues": {

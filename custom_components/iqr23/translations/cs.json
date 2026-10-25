@@ -9,7 +9,7 @@
         },
         "data_description": {
           "host": "Adresa webového rozhraní regulace, např. 192.168.1.20",
-          "master_password": "Potřeba pro přepínání režimů výstupů"
+          "master_password": "Potřeba pro přepínání režimů výstupů a nastavování teplot"
         }
       },
       "reconfigure": {
@@ -20,7 +20,7 @@
         },
         "data_description": {
           "host": "Adresa webového rozhraní regulace, např. 192.168.1.20",
-          "master_password": "Potřeba pro přepínání režimů výstupů"
+          "master_password": "Potřeba pro přepínání režimů výstupů a nastavování teplot"
         }
       }
     },
@@ -177,6 +177,86 @@
         "name": "Vstup {input}"
       }
     },
+    "number": {
+      "tank_base": {
+        "name": "Zásobník základní teplota"
+      },
+      "tank_upper_spring": {
+        "name": "Zásobník nahoře jaro"
+      },
+      "tank_upper_summer": {
+        "name": "Zásobník nahoře léto"
+      },
+      "tank_upper_autumn": {
+        "name": "Zásobník nahoře podzim"
+      },
+      "tank_upper_winter": {
+        "name": "Zásobník nahoře zima"
+      },
+      "tank_lower_spring": {
+        "name": "Zásobník dole jaro"
+      },
+      "tank_lower_summer": {
+        "name": "Zásobník dole léto"
+      },
+      "tank_lower_autumn": {
+        "name": "Zásobník dole podzim"
+      },
+      "tank_lower_winter": {
+        "name": "Zásobník dole zima"
+      },
+      "circuit_1_curve": {
+        "name": "Okruh TO1 topná křivka"
+      },
+      "circuit_1_setback": {
+        "name": "Okruh TO1 noční útlum"
+      },
+      "circuit_1_shift": {
+        "name": "Okruh TO1 posun křivky"
+      },
+      "circuit_1_min": {
+        "name": "Okruh TO1 minimální výstup"
+      },
+      "circuit_1_max": {
+        "name": "Okruh TO1 maximální výstup"
+      },
+      "circuit_2_curve": {
+        "name": "Okruh TO2 topná křivka"
+      },
+      "circuit_2_setback": {
+        "name": "Okruh TO2 noční útlum"
+      },
+      "circuit_2_shift": {
+        "name": "Okruh TO2 posun křivky"
+      },
+      "circuit_2_min": {
+        "name": "Okruh TO2 minimální výstup"
+      },
+      "circuit_2_max": {
+        "name": "Okruh TO2 maximální výstup"
+      },
+      "fireplace_start": {
+        "name": "Krb spouštěcí teplota"
+      },
+      "fireplace_hysteresis": {
+        "name": "Krb hystereze"
+      },
+      "solar_difference": {
+        "name": "Solar rozdíl teplot"
+      },
+      "pool_on": {
+        "name": "Bazén zapnutí dohřevu"
+      },
+      "pool_off": {
+        "name": "Bazén vypnutí dohřevu"
+      },
+      "cooling_on": {
+        "name": "Chlad zapnutí"
+      },
+      "cooling_off": {
+        "name": "Chlad vypnutí"
+      }
+    },
     "select": {
       "output_mode": {
         "name": "{output} režim",
@@ -192,6 +272,9 @@
   "exceptions": {
     "set_mode_failed": {
       "message": "Nepodařilo se nastavit režim výstupu {output}: {error}"
+    },
+    "set_setpoint_failed": {
+      "message": "Nepodařilo se nastavit hodnotu: {error}"
     }
   },
   "issues": {

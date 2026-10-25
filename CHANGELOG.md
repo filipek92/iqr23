@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Added
+- Setpoint numbers: tank base temperature and seasonal S1/S2 targets, heating circuit TO1/TO2 curve,
+  night setback, curve shift and flow limits, fireplace start temperature and hysteresis, solar
+  temperature difference, pool and cooling on/off temperatures. The controller only offers -/+ buttons,
+  so the integration presses them until the value is reached, verifies it and saves it.
+
 ### Changed
 - Entity keys (unique ID suffixes) were unified to snake_case, e.g. `watertankUpper` → `tank_upper`,
   `lowerFloorMixing` → `circuit_1_mixing`, `SP1_mode` → `output_sp1_mode`. Existing entries are migrated
