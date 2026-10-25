@@ -2,19 +2,226 @@
   "config": {
     "step": {
       "user": {
-        "title": "iQ R23 Control Unit",
+        "title": "iQ R23",
         "data": {
-          "host": "Host or IP address"
+          "host": "Host or IP address",
+          "master_password": "Service (master) password"
+        },
+        "data_description": {
+          "host": "Address of the controller web interface, e.g. 192.168.1.20",
+          "master_password": "Needed to change output modes"
+        }
+      },
+      "reconfigure": {
+        "title": "iQ R23",
+        "data": {
+          "host": "Host or IP address",
+          "master_password": "Service (master) password"
+        },
+        "data_description": {
+          "host": "Address of the controller web interface, e.g. 192.168.1.20",
+          "master_password": "Needed to change output modes"
         }
       }
     },
     "error": {
-      "cannot_connect": "Cannot connect to the host.",
-      "invalid_auth": "Authentication failure.",
-      "unknown": "Unknown error."
+      "cannot_connect": "Cannot connect to the controller.",
+      "unknown": "Unexpected error."
     },
     "abort": {
-      "already_configured": "Already configured for this host."
+      "already_configured": "This controller is already configured.",
+      "reconfigure_successful": "Reconfiguration was successful.",
+      "wrong_device": "The address points to a different controller."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "outdoor_temperature": {
+        "name": "Outdoor temperature"
+      },
+      "outdoor_temperature_min": {
+        "name": "Outdoor temperature 24h min"
+      },
+      "outdoor_temperature_max": {
+        "name": "Outdoor temperature 24h max"
+      },
+      "outdoor_temperature_mean": {
+        "name": "Outdoor temperature 24h mean"
+      },
+      "tank_upper": {
+        "name": "Tank upper"
+      },
+      "tank_upper_target": {
+        "name": "Tank upper target"
+      },
+      "tank_upper_heating_time": {
+        "name": "SP1 heating time"
+      },
+      "tank_middle": {
+        "name": "Tank middle"
+      },
+      "tank_lower": {
+        "name": "Tank lower"
+      },
+      "tank_lower_target": {
+        "name": "Tank lower target"
+      },
+      "tank_lower_heating_time": {
+        "name": "SP2 heating time"
+      },
+      "floor_lower": {
+        "name": "Circuit TO1"
+      },
+      "floor_lower_target": {
+        "name": "Circuit TO1 target"
+      },
+      "floor_lower_mixing": {
+        "name": "Circuit TO1 mixing valve"
+      },
+      "floor_upper": {
+        "name": "Circuit TO2"
+      },
+      "floor_upper_target": {
+        "name": "Circuit TO2 target"
+      },
+      "floor_upper_mixing": {
+        "name": "Circuit TO2 mixing valve"
+      },
+      "fireplace": {
+        "name": "Fireplace"
+      },
+      "solar": {
+        "name": "Solar collector"
+      },
+      "cooling": {
+        "name": "Cooling"
+      },
+      "pool_filter": {
+        "name": "Pool filtration"
+      },
+      "pool_exchanger": {
+        "name": "Pool exchanger"
+      },
+      "pool_min": {
+        "name": "Pool minimum"
+      },
+      "pool_max": {
+        "name": "Pool maximum"
+      }
+    },
+    "binary_sensor": {
+      "tank_upper_heating": {
+        "name": "SP1 heating"
+      },
+      "tank_lower_heating": {
+        "name": "SP2 heating"
+      },
+      "safety_thermostat": {
+        "name": "Safety thermostat 95 °C"
+      },
+      "pressure": {
+        "name": "System pressure"
+      },
+      "overcurrent_sp1": {
+        "name": "SP1 overcurrent"
+      },
+      "overcurrent_sp2": {
+        "name": "SP2 overcurrent"
+      },
+      "floor_lower_demand": {
+        "name": "Circuit TO1 thermostat demand"
+      },
+      "floor_lower_setback": {
+        "name": "Circuit TO1 setback"
+      },
+      "floor_lower_pump": {
+        "name": "Circuit TO1 pump"
+      },
+      "floor_upper_demand": {
+        "name": "Circuit TO2 thermostat demand"
+      },
+      "floor_upper_setback": {
+        "name": "Circuit TO2 setback"
+      },
+      "floor_upper_pump": {
+        "name": "Circuit TO2 pump"
+      },
+      "fireplace_pump": {
+        "name": "Fireplace pump"
+      },
+      "hot_water_circulation": {
+        "name": "Hot water circulation"
+      },
+      "low_tariff": {
+        "name": "Low tariff"
+      },
+      "ups": {
+        "name": "Backup power"
+      },
+      "pool_pump": {
+        "name": "Pool filtration pump"
+      },
+      "pool_tank_ready": {
+        "name": "Pool tank temperature ready"
+      },
+      "pool_solar_ready": {
+        "name": "Pool solar temperature ready"
+      },
+      "pool_error": {
+        "name": "Pool error"
+      },
+      "output_running": {
+        "name": "{output} output"
+      },
+      "digital_input": {
+        "name": "Input {input}"
+      }
+    },
+    "select": {
+      "output_mode": {
+        "name": "{output} mode",
+        "state": {
+          "auto": "Auto",
+          "auto_r": "AutoR",
+          "on": "On",
+          "off": "Off"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "set_mode_failed": {
+      "message": "Failed to set mode of output {output}: {error}"
+    }
+  },
+  "issues": {
+    "switches_removed": {
+      "title": "iQ R23 switches were replaced by selects",
+      "description": "Output switches were removed: {entities}.\n\nEach output now has a mode select (Auto / AutoR / On / Off) and a binary sensor with the actual output state. Update automations and dashboards that used the switches."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Installed modules",
+        "description": "The controller is universal. Entities are created only for selected modules.",
+        "data": {
+          "modules": "Modules"
+        }
+      }
+    }
+  },
+  "selector": {
+    "modules": {
+      "options": {
+        "tank": "Storage tank (SP1, SP2)",
+        "circuit_1": "Heating circuit TO1",
+        "circuit_2": "Heating circuit TO2",
+        "fireplace": "Fireplace",
+        "solar": "Solar collector",
+        "cooling": "Cooling",
+        "pool": "Pool"
+      }
     }
   }
 }

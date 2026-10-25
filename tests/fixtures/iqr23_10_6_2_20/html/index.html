@@ -1,0 +1,253 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="cz">
+<head>
+  <meta charset="windows-1250">
+  <title>iQR23</title>
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script language="Javascript" src="script/mchp.js"   type="text/javascript"></script>
+  <script language="Javascript" src="script/script.js" type="text/javascript"></script>
+  <script language="Javascript" src="script/data.js"   type="text/javascript"></script>
+</head>
+
+<body onLoad="setOpacityIE()">
+  <div class="pozadi">
+<!-- Horní pole TIME + VERSION -->
+    <div class="zahlavi">
+      <div style="position:absolute;top:0px;left: 10px;font-size: 11pt"><span id="_acctime">?</span></div>
+      <div style="position:absolute;top:1px;left:480px;font-size:  9pt;color:red"><span id="_acccust"></span></div>
+      <div style="position:absolute;top:1px;left:650px;font-size:  9pt"><span id="_accuser">?</span></div>
+      <div style="position:absolute;top:3px;left:750px;font-size:  7pt"><span id="_accvers">?</span></div>
+      <div style="position:absolute; left:300px; top:  0px;">           <span>1</span></div>
+      <div style="position:absolute; left:290px; top: -8px;font-size: 20pt;cursor:pointer;"><span id="col995" onclick="newAJAXCommand('t_but.cgi?but=995')">&bull;</span></div>
+      <div style="position:absolute; left:340px; top:  0px;">           <span>2</span></div>
+      <div style="position:absolute; left:330px; top: -8px;font-size: 20pt;cursor:pointer;"><span id="col996" onclick="newAJAXCommand('t_but.cgi?but=996')">&bull;</span></div>
+      <div style="position:absolute; left:380px; top:  0px;">           <span >3</span></div>
+      <div style="position:absolute; left:370px; top: -8px;font-size: 20pt;cursor:pointer;"><span id="col997" onclick="newAJAXCommand('t_but.cgi?but=997')">&bull;</span></div>
+      <div style="position:absolute; left:420px; top:  0px;">           <span >4</span></div>
+      <div style="position:absolute; left:410px; top: -8px;font-size: 20pt;cursor:pointer;"><span id="col998" onclick="newAJAXCommand('t_but.cgi?but=998')">&bull;</span></div>
+   </div>
+<!-- Prostřední pole -->
+    <div class="prusvitne"	style="overflow: auto; width:980px; height:460px; position: absolute; top: 30px; left: 20px;">
+<!--  <div style="position: absolute; top: 20px; left: 40px;">
+        <b>Provozní hodnoty</b>
+      </div> -->
+<!-- Krb -->
+      <div class="box-krb">
+        <div class="box-pozice-ikona"  ><img id="_ico115" src="img/ico_krb_off_60.png" class="box-ikona-size"/></div>
+        <div class="box-pozice-teplota"><span id="txt104" style="font-weight:normal" title="T04 teplota čidla krbu">---.-</span>°C</div>
+        <div style="position: absolute; top: 5px; left: 90px;font-size:  9pt;"><a title="Teplota, při které se spustí oběhové čerpadlo krbu">Tz=<a></div>
+        <div style="position: absolute; top: 5px; left:123px;font-size:  9pt;"><span id="txt680" title="Teplota, při které se spustí oběhové čerpadlo krbu">---</span>°C</div>
+        <div style="position: absolute; top:20px; left: 90px;font-size:  9pt;"><a title="Teplota, při které se vypne oběhové čerpadlo krbu">Tv=<a></div>
+        <div style="position: absolute; top:20px; left:123px;font-size:  9pt;"><span id="txt681" title="Teplota, při které se vypne oběhové čerpadlo krbu">---</span>°C</div>
+        <div style="position: absolute; top:65px; left: 90px;font-size:  9pt;"><span title="Podmínka pro zapnutí oběhového čerpadla zelený=podmínka splněna">Tz</span></div>
+        <div style="position: absolute; top:59px; left:135px;font-size:  9pt;"><span id="col287" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:80px; left: 90px;font-size:  9pt;"><span title="Podmínka pro vypnutí oběhového čerpadla zelený=podmínka splněna">Tv</span></div>
+        <div style="position: absolute; top:74px; left:135px;font-size:  9pt;"><span id="col288" style="font-size: 18pt">&bull;</span></div>
+        <div  class="box-pozice-nazev" ><span id="txt217">Krb x</div>
+        <div class="box-pozice-cerp"   ><img id="_ico104" style="width:30px; height:30px;" src="img/ico_cer_off_64.png" title="Stav oběhového čerpadla krbového okruhu"/></div>
+      </div>
+<!-- Solar -->
+      <div class="box-solar" style="visibility:visible;">
+        <div class="box-pozice-ikona"  ><img id="_ico116" src="img/ico_sol_off_60.png" class="box-ikona-size"></div>
+        <div class="box-pozice-teplota"><span id="txt105" style="font-weight:normal" title="T05 teplota čidla solárních panelů">---.-</span>°C</div>
+        <div style="position: absolute; top: 5px; left: 90px;font-size:  9pt;"><a title="Teplota, při které se spustí solární oběhové čerpadlo">Tz=<a></div>
+        <div style="position: absolute; top: 5px; left:123px;font-size:  9pt;"><span id="txt682" title="Teplota, při které se spustí solární oběhové čerpadlo">---</span>°C</div>
+        <div style="position: absolute; top:20px; left: 90px;font-size:  9pt;"><a title="Teplota, při které se vypne solární oběhové čerpadlo">Tv=<a></div>
+        <div style="position: absolute; top:20px; left:123px;font-size:  9pt;"><span id="txt683" title="Teplota, při které se vypne solární oběhové čerpadlo">---</span>°C</div>
+        <div style="position: absolute; top:50px; left: 90px;font-size:  9pt;"><span title="Podmínka pro zapnutí oběhového čerpadla zelený=podmínka splněna">Cir</span></div>
+        <div style="position: absolute; top:44px; left:135px;font-size:  9pt;"><span id="col291" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:65px; left: 90px;font-size:  9pt;"><span title="Podmínka pro zapnutí oběhového čerpadla zelený=podmínka splněna">Tz</span></div>
+        <div style="position: absolute; top:59px; left:135px;font-size:  9pt;"><span id="col289" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:80px; left: 90px;font-size:  9pt;"><span title="Podmínka pro vypnutí oběhového čerpadla zelený=podmínka splněna">Tv</span></div>
+        <div style="position: absolute; top:74px; left:135px;font-size:  9pt;"><span id="col290" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:95px; left: 90px;font-size:  9pt;"><span title="Solár nahřívá AZ">AZ</span></div>
+        <div style="position: absolute; top:89px; left:135px;font-size:  9pt;"><span id="col215" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:110px;left: 90px;font-size:  9pt;"><span title="Solár nahřívá BAZEN">BA</span></div>
+        <div style="position: absolute; top:104px;left:135px;font-size:  9pt;"><span id="col214" style="font-size: 18pt">&bull;</span></div>
+        <div  class="box-pozice-nazev" ><span id="txt216">Solár x</div>
+        <div class="box-pozice-cerp"   ><img id="_ico105" style="width:30px; height:30px;" src="img/ico_cer_off_64.png"  title="Stav oběhového čerpadla solárního okruhu"/></div>
+      </div>
+<!-- tepelne cerpadlo II PAPOUSEK-->
+      <div class="box-solar" style="visibility:hidden;">
+        <div class="box-pozice-ikona"  ><img id="_ico120" src="img/ico_tcc_off_60.png" class="box-ikona-size"></div>
+        <div class="box-pozice-teplota"><span id="txt110" style="font-weight:normal" title="T10 teplota čidla na výstupu tepelného čerpadla">---.-</span>°C</div>
+        <div class="box-pozice-nazev"  >TČ II horní</div>
+        <div style="position: absolute; top: 5px; left: 76px;font-size:  9pt;"><a title="Výstup 0-10V pro ATW modul TČ">ATW = <span id="txt651">--.--V</span></a></div>
+        <div style="position: absolute; top:20px; left: 76px;font-size:  9pt;"><a title="Teplota zásobníku TUV">TUV = <span id="txt199">--</span>°C</a></div>
+        <div style="position: absolute; top:35px; left: 76px;font-size:  9pt;"><a title="Nastavená teplota TUV">TUVs= <span id="txt518">--</span>°C</a></div>
+        <div style="position: absolute; top:50px; left: 77px;cursor:pointer;"><img onclick="newAJAXCommand('t_but.cgi?but=118')" src="img/btn_mns_15.png" ></div>
+        <div style="position: absolute; top:50px; left: 97px;cursor:pointer;"><img onclick="newAJAXCommand('t_but.cgi?but=119')" src="img/btn_pls_15.png" ></div>
+        <div style="position: absolute; top:65px; left: 90px;font-size:  9pt;"><span title="Výstup UT/TUV zelený=TUV">TUV</span></div>
+        <div style="position: absolute; top:59px; left:135px;font-size:  9pt;"><span id="col660" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:80px; left: 90px;font-size:  9pt;"><span title="Výstup Start Ohřevu tepelného čerpadla">STOH</span></div>
+        <div style="position: absolute; top:74px; left:135px;font-size:  9pt;"><span id="col655" style="font-size: 18pt">&bull;</span></div>
+        <div class="box-pozice-cerp"   ><img id="_ico110" style="width:30px; height:30px;" src="img/ico_cer_off_64.png"  title="Stav oběhového čerpadla Hydrobox-->Zásobník"/></div>
+      </div>
+<!-- tepelne cerpadlo I-->
+      <div class="box-tcerpadlo">
+        <div class="box-pozice-ikona"  ><img id="_ico117" src="img/ico_tcc_off_60.png" class="box-ikona-size"></div>
+        <div class="box-pozice-teplota"><span id="txt103" style="font-weight:normal" title="T03 teplota čidla na výstupu tepelného čerpadla">---.-</span>°C</div>
+        <div class="box-pozice-nazev"  ><span id="txt215">TČ x</div>
+        <div style="position: absolute; top: 5px; left: 76px;font-size:  9pt;"><a title="Výstup 0-10V pro ATW modul TČ">ATW = <span id="txt642">--.--V</span></a></div>
+ <!--   <div style="position: absolute; top:20px; left: 90px;font-size:  9pt;"><span title="Bivalence pro spirálu SP1 zelený=SP1 sepnuta">BIV1</span></div>
+        <div style="position: absolute; top:14px; left:135px;font-size:  9pt;"><span id="zzcol206" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:35px; left: 90px;font-size:  9pt;"><span title="Bivalence pro spirálu SP2 zelený=SP2 sepnuta">BIV2</span></div>
+        <div style="position: absolute; top:29px; left:135px;font-size:  9pt;"><span id="zzcol206" style="font-size: 18pt">&bull;</span></div> -->
+        <div style="position: absolute; top:35px; left: 90px;font-size:  9pt;"><span title="Vstup průtok Tepelného čerpadla zelený=OK">PRU</span></div>
+        <div style="position: absolute; top:29px; left: 135px;font-size:  9pt;"><span id="col566" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:50px; left: 90px;font-size:  9pt;"><span title="Výstup Horní/Dolní ohřev Tepelného čerpadla zelený=dolní ohřev">H/D</span></div>
+        <div style="position: absolute; top:44px; left: 135px;font-size:  9pt;"><span id="col450" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:65px; left: 90px;font-size:  9pt;"><span title="Výstup Top/Chlaď Tepelného čerpadla zelený=chlaď">T/C</span></div>
+        <div style="position: absolute; top:59px; left: 135px;font-size:  9pt;"><span id="col445" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:80px; left: 90px;font-size:  9pt;"><span title="Výstup Start Ohřevu tepelného čerpadla">STOH</span></div>
+        <div style="position: absolute; top:74px; left: 135px;font-size:  9pt;"><span id="col455" style="font-size: 18pt">&bull;</span></div>
+        <div class="box-pozice-cerp"   ><img id="_ico109" style="width:30px; height:30px;" src="img/ico_cer_off_64.png"  title="Stav oběhového čerpadla Hydrobox-->Zásobník"/></div>
+      </div>
+<!-- Venkovni teplota -->
+      <div class="box-teplomer">
+        <div class="box-pozice-ikona"  ><img id="_ico118" src="img/ico_tep_ko_60.png" class="box-ikona-size"></div>
+        <div class="box-pozice-teplota"><span id="txt113" style="font-weight:normal" title="T13 teplota venkovního čidla">---.-</span>°C</div>
+<!--    <div style="position: absolute; top:20px; left: 80px;font-size:  9pt;"><a>1h<a></div>
+        <div style="position: absolute; top:20px; left:103px;font-size:  9pt;">= <span id="txt710">---.-</span>°C</div>
+        <div style="position: absolute; top:35px; left: 80px;font-size:  9pt;"><a>6h<a></div>
+        <div style="position: absolute; top:35px; left:103px;font-size:  9pt;">= <span id="txt711">---.-</span>°C</div>
+        <div style="position: absolute; top:50px; left: 80px;font-size:  9pt;"><a>12h<a></div>
+        <div style="position: absolute; top:50px; left:103px;font-size:  9pt;">= <span id="txt712">---.-</span>°C</div>  -->
+        <div style="position: absolute; top:65px; left: 80px;font-size:  9pt;"><a title="Minimální teplota za posledních 24 hodin">min <a></div>
+        <div style="position: absolute; top:65px; left:113px;font-size:  9pt;"><span id="txt714" title="Minimální teplota za posledních 24 hodin">---.-</span>°C</div>
+        <div style="position: absolute; top:80px; left: 80px;font-size:  9pt;"><a title="Průměrná teplota za posledních 24 hodin" >24h <a></div>
+        <div style="position: absolute; top:80px; left:113px;font-size:  9pt;"><span id="txt713" title="Průměrná teplota za posledních 24 hodin">---.-</span>°C</div>
+        <div style="position: absolute; top:95px; left: 80px;font-size:  9pt;"><a title="Maximální teplota za posledních 24 hodin">max <a></div>
+        <div style="position: absolute; top:95px; left:113px;font-size:  9pt;"><span id="txt715" title="Maximální teplota za posledních 24 hodin">---.-</span>°C</div>
+        <div  class="box-pozice-nazev" >
+          Venkovní teplota
+        </div>
+      </div>
+<!-- Zasobnik-->
+      <div class="box-zasobnik1">
+        <div style="position:absolute; top: 35px; left: 70px;font-size:12pt;"><img id="_ico119" src="img/ico_zas_ko_60.png" class="box-ikona-size"></div>
+
+        <div style="position:absolute; top: 15px; left: 10px;font-size:12pt;"><span id="txt101" style="font-weight:normal" title="Teplota čidla T01 horní části zásobníku">---.-</span>°C</div>
+        <div style="position:absolute; top: 45px; left: 10px;font-size:12pt;"><span id="txt102" style="font-weight:normal" title="Teplota čidla T02 střední části zásobníku">---.-</span>°C</div>
+        <div style="position:absolute; top: 65px; left: 15px;cursor:auto   ;"><img id="_ico101" class="box-size-SP" src="img/ico_spi_off_64.png" title="Topná spirála SP1"/></div>
+        <div style="position:absolute; top:100px; left: 10px;font-size:10pt;"><a title="Požadovaná teplota S1 horní části zásobníku">S1=<span id="txt501">--</span>°C</a></div>
+
+        <div style="position:absolute; top:140px; left: 10px;font-size:12pt;"><span id="txt106" style="font-weight:normal" title="Teplota čidla T06 dolní části zásobníku">---.-</span>°C</div>
+        <div style="position:absolute; top:160px; left: 15px;cursor:auto   ;"><img id="_ico102" class="box-size-SP" src="img/ico_spi_off_64.png" title="Topná spirála SP2"/></div>
+        <div style="position:absolute; top:195px; left: 10px;font-size:10pt;"><a title="Požadovaná teplota S2 dolní části zásobníku">S2=<span id="txt502">--</span>°C</a></div>
+
+        <div style="position:absolute; top: 15px; left:140px;font-size:  9pt;"><span title="Stav vstupu NT nízkého tarifu HDO">NT</span></div>
+        <div style="position:absolute; top:  8px; left:170px;font-size:  9pt;"><span title="Stav vstupu NT nízkého tarifu HDO" id="col203" style="font-size: 18pt">&bull;</span></div>
+
+        <div style="position:absolute; top: 30px; left:140px;font-size:  9pt;"><span title="Stav vstupu nadproudové ochrany HJ103 spirály SP1">NP1</span></div>
+        <div style="position:absolute; top: 23px; left:170px;font-size:  9pt;"><span title="Stav vstupu nadproudové ochrany HJ103 spirály SP1" id="col204" style="font-size: 18pt">&bull;</span></div>
+
+        <div style="position:absolute; top: 45px; left:140px;font-size:  9pt;"><span title="Stav vstupu nadproudové ochrany HJ103 spirály SP2">NP2</span></div>
+        <div style="position:absolute; top: 38px; left:170px;font-size:  9pt;"><span title="Stav vstupu nadproudové ochrany HJ103 spirály SP2" id="col205" style="font-size: 18pt">&bull;</span></div>
+
+        <div style="position:absolute; top: 60px; left:140px;font-size:  9pt;"><span title="Stav oběhového čerpadla cirkulace TUV ">TVC</span></div>
+        <div style="position:absolute; top: 53px; left:170px;font-size:  9pt;"><span title="Stav oběhového čerpadla cirkulace TUV " id="col106" style="font-size: 18pt">&bull;</span></div>
+
+        <div style="position:absolute; top: 75px; left:140px;font-size:  9pt;"><span title="Stav oběhového čerpadla cirkulace TUV ">UPS</span></div>
+        <div style="position:absolute; top: 68px; left:170px;font-size:  9pt;"><span title="Stav oběhového čerpadla cirkulace TUV " id="col211" style="font-size: 18pt">&bull;</span></div>
+
+        <div style="position:absolute; top: 15px; left:200px;font-size:  9pt;"><span title="Stav vstupu bezpečnostního teplotního čidla 95°C, zelená OK">T95</span></div>
+        <div style="position:absolute; top:  8px; left:230px;font-size:  9pt;"><span title="Stav vstupu bezpečnostního teplotního čidla 95°C, zelená OK" id="col201" style="font-size: 18pt">&bull;</span></div>
+
+        <div style="position:absolute; top: 30px; left:200px;font-size:  9pt;"><span title="Stav vstupu tlakového čidla, zelená OK">Tlak</span></div>
+        <div style="position:absolute; top: 23px; left:230px;font-size:  9pt;"><span title="Stav vstupu tlakového čidla, zelená OK" id="col202" style="font-size: 18pt">&bull;</span></div>
+
+        <div style="position:absolute; top:195px; left: 85px; width: 160px; text-align: right"><span id="txt210">AZ x</div>
+      </div>
+      <div class="box-zasobnik2">
+        <div style="position:absolute; top: 10px; left: 10px;font-size:12pt;"><span id="txt109" style="font-weight:normal" title="Teplota čidla chladu Tch">---.-</span>°C <a style="font-size:10pt;">Tchl</a></div>
+        <div style="position:absolute; top: 60px; left: 10px;font-size:10pt;">Tset= <span id="txt737" style="font-weight:normal" title="Teplota Chladu vypínací(minimální)">--</span>°C</div>
+        <div style="position:absolute; top: 60px; left: 90px;font-size:10pt;">Tmax= <span id="txt738" style="font-weight:normal" title="Teplota Chladu zypínací(maximálni)">--</span>°C</div>
+        <div style="position:absolute; top: 60px; left: 85px; width: 160px; text-align: right"><span id="txt903">Chlad x</div>
+      </div>
+      <div class="box-zasobnik3">
+        <div style="position:absolute; top: 10px; left: 10px;font-size:12pt;"><span id="txt107" style="font-weight:normal" title="Teplota čidla Bazénu na filtraci">---.-</span>°C <a style="font-size:10pt;">Tbaz</a></div>
+        <div style="position:absolute; top: 35px; left: 10px;font-size:12pt;"><span id="txt108" style="font-weight:normal" title="Teplota čidla Bazénu na výměníku">---.-</span>°C <a style="font-size:10pt;">Tvym</a></div>
+        <div style="position:absolute; top: 60px; left: 10px;font-size:10pt;">Tset= <span id="txt730" style="font-weight:normal" title="Teplota Bazénu minimální">--</span>°C</div>
+        <div style="position:absolute; top: 60px; left: 90px;font-size:10pt;">Tmax= <span id="txt731" style="font-weight:normal" title="Teplota Bazénu maximálni">--</span>°C</div>
+        <div style="position:absolute; top: 10px; left:140px;font-size:  9pt;"><span title="Oběhové čerpadlo bazénové filtrace"  >OCF</span></div>
+        <div style="position:absolute; top:  3px; left:170px;font-size:  9pt;"><span title="Oběhové čerpadlo bazénové filtrace"   id="col213" style="font-size: 18pt">&bull;</span></div>
+        <div style="position:absolute; top: 25px; left:140px;font-size:  9pt;"><span title="Teplota AZ je OK pro spuštění OČ"    >Taz</span></div>
+        <div style="position:absolute; top: 18px; left:170px;font-size:  9pt;"><span title="Teplota AZ je OK pro spuštění OČ"     id="col292" style="font-size: 18pt">&bull;</span></div>
+        <div style="position:absolute; top: 40px; left:140px;font-size:  9pt;"><span title="Teplota Solaru je OK pro spuštění OČ">Tso</span></div>
+        <div style="position:absolute; top: 33px; left:170px;font-size:  9pt;"><span title="Teplota Solaru je OK pro spuštění OČ" id="col293" style="font-size: 18pt">&bull;</span></div>
+        <div style="position:absolute; top: 10px; left:200px;font-size:  9pt;"><span title="Porucha čidla nebo Tvym je vysoká"   >ERR</span></div>
+        <div style="position:absolute; top:  3px; left:230px;font-size:  9pt;"><span title="Porucha čidla nebo Tvym je vysoká"    id="col294" style="font-size: 18pt">&bull;</span></div>
+        <div style="position:absolute; top: 40px; left:200px;font-size:  9pt;"><span title="Oběhové čerpadlo výměníku"           >OCV</span></div>
+        <div style="position:absolute; top: 33px; left:230px;font-size:  9pt;"><span title="Porucha čidla nebo Tvym je vysoká"    id="col670" style="font-size: 18pt">&bull;</span></div>
+        <div style="position:absolute; top: 60px; left: 85px; width: 160px; text-align: right"><span id="txt902">Bazén x</div>
+     </div>
+<!-- Ekviterm 1 -->
+      <div class="box-ekviterm1">
+        <div class="box-pozice-ikona"  ><img id="_ico113" src="img/ico_emp_ko_60.png" class="box-ikona-size"></div>
+        <div class="box-pozice-teplota"><span id="txt111" style="font-weight:normal" title="T11 teplota čidla na výstupu ekvitermního okruhu TO1">---.-</span>°C</div>
+        <div class="box-pozice-nazev"  ><span id="txt213">TO x</div>
+        <div style="position: absolute; top:  5px; left: 90px;font-size:  9pt;"><a title="Požadovaná teplota ekvitermního okruhu TO1">Tp=<span id="txt520">--</span>°C</a></div>
+        <div style="position: absolute; top: 20px; left: 90px;font-size:  9pt;"><a title="Velikost otevření třícestného směšovacího ventilu okruhu TO1 v procentech">Ux=<span id="txt521">--</span></a></div>
+        <div style="position: absolute; top: 35px; left: 90px;font-size:  9pt;"><span title="Vstup z prostorového termostatu TO1, zelená=požadavek top">trstat.</span></div>
+        <div style="position: absolute; top: 29px; left:135px;font-size:  9pt;"><span id="col206" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top: 50px; left: 90px;font-size:  9pt;"><span title="Útlum topného okruhu, zelená=útlum aktivní">utlum</span></div>
+        <div style="position: absolute; top:44px; left: 135px;font-size:  9pt;"><span id="col115" style="font-size: 18pt">&bull;</span></div>
+        <div class="box-pozice-cerp"   ><img id="_ico107" style="width:30px; height:30px;" src="img/ico_cer_off_64.png" title="Stav oběhového čerpadla topného okruhu TO1"/></div>
+      </div>
+<!-- Ekviterm 2 -->
+      <div class="box-ekviterm2">
+        <div class="box-pozice-ikona"  ><img id="_ico114" src="img/ico_emp_ko_60.png" class="box-ikona-size"></div>
+        <div class="box-pozice-teplota"><span id="txt112" style="font-weight:normal" title="T12 teplota čidla na výstupu ekvitermního okruhu TO2">---.-</span>°C</div>
+        <div class="box-pozice-nazev"  ><span id="txt214">TO x</div>
+        <div style="position: absolute; top: 5px; left: 90px;font-size:  9pt;"><a title="Požadovaná teplota ekvitermního okruhu TO2">Tp=<span id="txt526">--</span>°C</a></div>
+        <div style="position: absolute; top:20px; left: 90px;font-size:  9pt;"><a title="Velikost otevření třícestného směšovacího ventilu okruhu TO2 v procentech">Ux=<span id="txt527">--</span></a></div>
+        <div style="position: absolute; top:35px; left: 90px;font-size:  9pt;"><span title="Vstup z prostorového termostatu TO2, zelená=požadavek top">trstat.</span></div>
+        <div style="position: absolute; top:29px; left: 135px;font-size:  9pt;"><span id="col207" style="font-size: 18pt">&bull;</span></div>
+        <div style="position: absolute; top:50px; left: 90px;font-size:  9pt;"><span title="Útlum topného okruhu, zelená=útlum aktivní">utlum</span></div>
+        <div style="position: absolute; top:44px; left: 135px;font-size:  9pt;"><span id="col116" style="font-size: 18pt">&bull;</span></div>
+        <div class="box-pozice-cerp"   ><img id="_ico108" style="width:30px; height:30px;" src="img/ico_cer_off_64.png" title="Stav oběhového čerpadla topného okruhu TO2"/></div>
+      </div>
+    </div>
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- Spodní řada menu Teploty, Nastavení teplot, Nastavení parametrů----------------------------------------------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+    <div class="prusvitne" style="width:980px; height:90px; position: absolute; top: 500px; left: 20px; overflow:hidden; ">
+      <div style="position: absolute; top: 10px; left: 50px;">
+        <a href="index.html"    ><img src="img/ici_ind_70.png" style="width: 70px; height: 70px;" title="Provozní hodnoty"/   ></a>
+      </div>
+      <div style="position: absolute; top: 10px; left: 150px;">
+        <a href="teploty.html"  ><img src="img/ici_tep_70.png" style="width: 70px; height: 70px;" title="Nastavení teplot"/   ></a>
+      </div>
+      <div style="position: absolute; top: 10px; left: 250px;">
+        <a href="nastaveni.html"><img src="img/ici_nas_70.png" style="width: 70px; height: 70px;" title="Nastavení parametrů"/></a>
+      </div>
+ <!--
+      <div style="position: absolute; top: 20px; left: 340px;">
+        <a href="system.html">
+          <img src="img/system.png" title="Systém"/>
+        </a>
+      </div>
+-->
+<!--  <div style="position: absolute; top: 10px; left: 840px; visibility:visible;">  -->
+      <div id="_vis102" style="position: absolute; top: 10px; left: 740px; visibility:hidden;">
+        <img src="img/ici_sav_70.png"  style="width: 70px; height: 70px;" title="Ulož nastavení" onclick="newAJAXCommand('t_but.cgi?but=999')"/>
+      </div>
+      <div style="position: absolute; top: 10px; left: 840px;">
+        <a href="login.html">
+          <img id="_ici101" src="img/ici_lo0_70.png" style="width: 70px; height: 70px;" title="Přihlášení"/>
+        </a>
+      </div>
+      <div id="_vis201">
+      </div>
+    </div>
+  </div>
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- Java script--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+  <script type="text/javascript">
+    setTimeout("newAJAXCommand('data.xml'        , uSversion   , true)",500);
+    setTimeout("newAJAXCommand('data_i_all.xml'  , updateStatus, true)",500);
+  </script>
+</body>
+</html>
