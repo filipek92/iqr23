@@ -103,8 +103,9 @@ async def test_migrate_from_v1(
         data={CONF_HOST: HOST, CONF_VERSION: VERSION},
     )
     entry.add_to_hass(hass)
+    # Releases before 1.1.2 used an empty device identifier.
     device = device_registry.async_get_or_create(
-        config_entry_id=entry.entry_id, identifiers={(DOMAIN, HOST)}
+        config_entry_id=entry.entry_id, identifiers={(DOMAIN, "")}
     )
     temp = entity_registry.async_get_or_create(
         "sensor", DOMAIN, "iqr23_outdoorTemp", config_entry=entry,
@@ -148,6 +149,8 @@ async def test_migrate_from_v1(
     assert issue_registry.async_get_issue(DOMAIN, "switches_removed")
 
     assert device_registry.async_get(device.id).identifiers == {(DOMAIN, entry.entry_id)}
+    assert len(dr.async_entries_for_config_entry(device_registry, entry.entry_id)) == 1
+    assert entity_registry.async_get(temp.entity_id).device_id == device.id
 
 
 async def test_diagnostics_redacts_password(hass: HomeAssistant, mock_device, config_entry) -> None:
