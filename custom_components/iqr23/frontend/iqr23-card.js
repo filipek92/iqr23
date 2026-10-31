@@ -221,7 +221,7 @@ const STYLES = `
     display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 4px;
     border-radius: 10px; border: 0; cursor: pointer; background: var(--secondary-background-color);
   }
-  .tile .flame { color: var(--state-climate-heat-color, #ff8100); }
+  .tile .active { color: var(--state-climate-heat-color, #ff8100); }
   .tile-value { font-size: 15px; font-weight: 500; }
   .empty { padding: 16px 20px; }
 `;
@@ -552,10 +552,11 @@ class IQR23Card extends HTMLElement {
 
   _tile(key, label, iconName, pumpKey, iconClass = "") {
     if (!this._has(key)) return "";
-    const pump = this._isOn(pumpKey) ? ` · ${this._t("pump")}` : "";
+    const running = this._isOn(pumpKey);
+    const pump = running ? ` · ${this._t("pump")}` : "";
     return `
       <button type="button" class="tile" ${this._moreInfo(key)}>
-        <span class="${iconClass}">${icon(iconName, 22)}</span>
+        <span class="${running ? iconClass : ""}">${icon(iconName, 22)}</span>
         <span class="tile-value">${escape(this._format(key))}</span>
         <span class="small">${escape(label + pump)}</span>
       </button>`;
@@ -563,8 +564,8 @@ class IQR23Card extends HTMLElement {
 
   _tiles() {
     const tiles = [
-      this._tile("fireplace", this._t("fireplace"), "flame", "fireplace_pump", "flame"),
-      this._tile("solar", this._t("solar"), "sun"),
+      this._tile("fireplace", this._t("fireplace"), "flame", "fireplace_pump", "active"),
+      this._tile("solar", this._t("solar"), "sun", "solar_pump", "active"),
       this._tile("pool_filtration", this._t("pool"), "waves", "pool_pump"),
       this._tile("cooling", this._t("cooling"), "snowflake"),
     ].join("");

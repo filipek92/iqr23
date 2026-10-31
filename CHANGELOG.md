@@ -13,6 +13,8 @@
   so the integration presses them until the value is reached, verifies it and saves it.
 
 ### Changed
+- The fireplace and solar icons on the card are only coloured while their pump is running; the solar
+  tile also shows the running pump.
 - Setpoint numbers tuned once at commissioning (seasonal S1/S2, heating curve, setback, flow limits,
   fireplace, solar, cooling) are configuration entities; tank base temperature, curve shifts and
   pool temperatures stay as controls.

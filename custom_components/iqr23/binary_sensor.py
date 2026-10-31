@@ -21,6 +21,9 @@ from .modules import Module
 
 PARALLEL_UPDATES = 0
 
+# Outputs the Lovelace card looks up; it finds entities by their translation key.
+OUTPUT_TRANSLATION_KEYS = {"sol": "solar_pump"}
+
 
 def _is_one(value: str) -> bool:
     return value == "1"
@@ -265,7 +268,7 @@ class IQR23OutputBinarySensor(IQR23Entity, BinarySensorEntity):
     def __init__(self, coordinator: IQR23Coordinator, output: DigitalOutput) -> None:
         description = BinarySensorEntityDescription(
             key=f"output_{output.key}",
-            translation_key="output_running",
+            translation_key=OUTPUT_TRANSLATION_KEYS.get(output.key, "output_running"),
             translation_placeholders={"output": output.name},
         )
         super().__init__(coordinator, description, output.state_key)
