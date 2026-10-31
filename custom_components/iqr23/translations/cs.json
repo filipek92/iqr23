@@ -173,6 +173,9 @@
       "output_running": {
         "name": "{output} výstup"
       },
+      "solar_pump": {
+        "name": "{output} výstup"
+      },
       "digital_input": {
         "name": "Vstup {input}"
       }

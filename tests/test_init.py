@@ -184,7 +184,9 @@ async def test_migrate_from_v1(
     assert migrated.name == "Venkovní teplota garáž"
     assert hass.states.get("sensor.iqr23_outdoortemp").state == "5.4"
 
-    assert entity_registry.async_get(solar.entity_id).unique_id == f"{entry.entry_id}_output_sol"
+    solar_entry = entity_registry.async_get(solar.entity_id)
+    assert solar_entry.unique_id == f"{entry.entry_id}_output_sol"
+    assert solar_entry.translation_key == "solar_pump"
     assert hass.states.get(tariff.entity_id).state == "on"
     # No duplicates were created next to the migrated entities.
     assert hass.states.get("binary_sensor.iq_r23_low_tariff") is None
