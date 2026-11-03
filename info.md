@@ -1,22 +1,20 @@
 # iQ R23 Integration
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
-This Home Assistant custom integration provides connectivity with iQ R23 heating controllers made by iQ vytápění, allowing you to monitor and control your heating system directly from Home Assistant.
+Home Assistant integration for the iQ R23 heating controller made by iQ vytápění. It reads the
+controller's local web interface and lets you monitor and control the heating system from Home Assistant.
 
-## What you get
+## Features
 
-- **Temperature monitoring** - Track temperatures from multiple zones and sensors
-- **System status** - Monitor pump status, pressure, heating elements
-- **Output control** - Switch every output between Auto, AutoR, On and Off
-- **Setpoints** - Change tank, heating circuit, fireplace, solar, pool and cooling temperatures
-- **Real-time updates** - Automatic polling for current data
+- **Temperatures** – outdoor, storage tank, heating circuits TO1/TO2, fireplace, solar, pool and cooling
+- **Status** – heating coils, pumps, thermostat demands, low tariff and fault inputs
+- **Output control** – switch every output between Auto, AutoR, On and Off
+- **Setpoints** – tank, heating circuit, fireplace, solar, pool and cooling temperatures
+- **Dashboard card** – bundled Lovelace card, no separate installation needed
 
-## Quick Setup
+## Setup
 
-1. Install via HACS
-2. Add integration via UI
-3. Enter your controller's IP address
-4. Enjoy automated heating control!
-
-Perfect for smart home enthusiasts who want full control over their heating system.
+1. Install via HACS and restart Home Assistant
+2. Add the **iQ R23** integration in Settings → Devices & Services
+3. Enter the controller's IP address or hostname and the service (master) password

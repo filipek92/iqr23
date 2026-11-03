@@ -71,7 +71,7 @@ the **iQ R23** card from the card picker, or in YAML:
 ```yaml
 type: custom:iqr23-card
 device_id: 0123456789abcdef  # optional, the first iQ R23 device is used otherwise
-title: Kotelna               # optional
+title: Boiler room           # optional
 show_controls: true          # optional, -/+ buttons for setpoints
 ```
 
@@ -90,6 +90,9 @@ and dashboards using them can be updated.
 
 - Home Assistant 2025.2.0 or newer
 - iQ R23 controller reachable over the network
+
+Tested with firmware `iQR23L08b` (2018/03/06). Setpoint limits were measured on this version;
+other firmware versions may differ – reports are welcome.
 
 ## Troubleshooting
 

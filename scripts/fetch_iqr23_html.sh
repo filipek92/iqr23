@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-HOST="${1:-192.168.1.20}"
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 <host> [output_dir]" >&2
+  exit 1
+fi
+
+HOST="$1"
 OUT_DIR="${2:-tests/fixtures/iqr23_${HOST//./_}/html}"
 TIMEOUT="${TIMEOUT:-15}"
 
@@ -13,8 +18,8 @@ PAGES=(
 
 mkdir -p "$OUT_DIR"
 
-echo "Stahuji HTML ze zarizeni: $HOST"
-echo "Vystupni slozka: $OUT_DIR"
+echo "Downloading HTML from: $HOST"
+echo "Output directory: $OUT_DIR"
 
 for page in "${PAGES[@]}"; do
   url="http://${HOST}/${page}"
@@ -24,18 +29,18 @@ for page in "${PAGES[@]}"; do
   http_code="$(curl -sS --compressed --connect-timeout "$TIMEOUT" --max-time "$TIMEOUT" -o "$out_file" -w "%{http_code}" "$url" || true)"
 
   if [[ "$http_code" != "200" ]]; then
-    echo "   CHYBA: HTTP ${http_code} pro ${page}"
+    echo "   ERROR: HTTP ${http_code} for ${page}"
     rm -f "$out_file"
     continue
   fi
 
   if ! grep -qi "<html" "$out_file"; then
-    echo "   CHYBA: Obsah nevypada jako HTML v ${page}"
+    echo "   ERROR: content does not look like HTML in ${page}"
     rm -f "$out_file"
     continue
   fi
 
-  echo "   OK: ulozeno do ${out_file}"
+  echo "   OK: saved to ${out_file}"
 done
 
-echo "Hotovo."
+echo "Done."

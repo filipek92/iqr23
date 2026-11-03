@@ -1,30 +1,69 @@
 # Changelog
 
+All notable changes to this project are documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [Unreleased]
+
+### Changed
+- Test fixtures and helper scripts no longer refer to a particular installation; the fetch scripts
+  require the controller address as an argument.
+
+## [2.3.2] - 2026-11-03
 
 ### Added
 - Integration icon and logo (iQ vytápění brand, light and dark variants) shipped in `brand/`,
   shown in the Home Assistant integration settings from 2026.3.
+
+## [2.3.1] - 2026-10-31
+
+### Changed
+- The fireplace and solar icons on the card are only coloured while their pump is running; the solar
+  tile also shows the running pump.
+
+## [2.3.0] - 2026-10-25
+
+### Added
 - Lovelace card `custom:iqr23-card` bundled with the integration, no separate installation needed:
   outdoor temperature, fault banner, storage tank with heating state, heating circuits with pump,
   demand, setback and mixing valve, fireplace/solar/pool/cooling tiles and -/+ buttons for the tank
   base temperature and curve shifts. Presses are collected and sent as one change.
+
+## [2.2.1] - 2026-10-25
+
+### Changed
+- Setpoint numbers tuned once at commissioning (seasonal S1/S2, heating curve, setback, flow limits,
+  fireplace, solar, cooling) are configuration entities; tank base temperature, curve shifts and
+  pool temperatures stay as controls.
+
+## [2.2.0] - 2026-10-25
+
+### Added
 - Setpoint numbers: tank base temperature and seasonal S1/S2 targets, heating circuit TO1/TO2 curve,
   night setback, curve shift and flow limits, fireplace start temperature and hysteresis, solar
   temperature difference, pool and cooling on/off temperatures. The controller only offers -/+ buttons,
   so the integration presses them until the value is reached, verifies it and saves it.
 
+## [2.1.0] - 2026-10-25
+
 ### Changed
-- The fireplace and solar icons on the card are only coloured while their pump is running; the solar
-  tile also shows the running pump.
-- Setpoint numbers tuned once at commissioning (seasonal S1/S2, heating curve, setback, flow limits,
-  fireplace, solar, cooling) are configuration entities; tank base temperature, curve shifts and
-  pool temperatures stay as controls.
 - Entity keys (unique ID suffixes) were unified to snake_case, e.g. `watertankUpper` → `tank_upper`,
   `lowerFloorMixing` → `circuit_1_mixing`, `SP1_mode` → `output_sp1_mode`. Existing entries are migrated
   automatically; entity IDs, custom names and history are kept.
 - The firmware version is stored as `firmware_version` in the config entry.
 - The device manufacturer is `iQ vytápění` (was `IQ Topeni`).
+
+## [2.0.2] - 2026-10-25
+
+### Added
+- Devices that no longer belong to the controller can be removed from the device page.
+
+## [2.0.1] - 2026-10-25
+
+### Fixed
+- Releases before 1.1.2 registered the device with an empty identifier; the migration left it
+  orphaned and created a second device.
 
 ## [2.0.0] - 2026-10-25
 
@@ -53,6 +92,11 @@
   They are diagnostic entities disabled by default.
 - Disconnected temperature sensors reported `NaN` instead of unknown.
 
+## [1.2.2] - 2025-07-12
+
+### Added
+- HACS metadata, MIT license and a version management script.
+
 ## [1.1.2] - 2025-01-12
 
 ### Changed
@@ -76,3 +120,15 @@
 - Comprehensive README with installation and configuration instructions
 - Version tracking file
 - Proper async discovery method with error handling
+
+[Unreleased]: https://github.com/filipek92/iqr23/compare/v2.3.2...HEAD
+[2.3.2]: https://github.com/filipek92/iqr23/compare/v2.3.1...v2.3.2
+[2.3.1]: https://github.com/filipek92/iqr23/compare/v2.3.0...v2.3.1
+[2.3.0]: https://github.com/filipek92/iqr23/compare/v2.2.1...v2.3.0
+[2.2.1]: https://github.com/filipek92/iqr23/compare/v2.2.0...v2.2.1
+[2.2.0]: https://github.com/filipek92/iqr23/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/filipek92/iqr23/compare/v2.0.2...v2.1.0
+[2.0.2]: https://github.com/filipek92/iqr23/compare/v2.0.1...v2.0.2
+[2.0.1]: https://github.com/filipek92/iqr23/compare/v2.0.0...v2.0.1
+[2.0.0]: https://github.com/filipek92/iqr23/compare/v1.2.2...v2.0.0
+[1.2.2]: https://github.com/filipek92/iqr23/releases/tag/v1.2.2
