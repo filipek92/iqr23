@@ -6,9 +6,12 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.3.3] - 2026-11-03
+
 ### Changed
 - Test fixtures and helper scripts no longer refer to a particular installation; the fetch scripts
   require the controller address as an argument.
+- README states that the integration is unofficial and not affiliated with iQ vytápění.
 
 ## [2.3.2] - 2026-11-03
 
@@ -121,7 +124,8 @@ and the project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.
 - Version tracking file
 - Proper async discovery method with error handling
 
-[Unreleased]: https://github.com/filipek92/iqr23/compare/v2.3.2...HEAD
+[Unreleased]: https://github.com/filipek92/iqr23/compare/v2.3.3...HEAD
+[2.3.3]: https://github.com/filipek92/iqr23/compare/v2.3.2...v2.3.3
 [2.3.2]: https://github.com/filipek92/iqr23/compare/v2.3.1...v2.3.2
 [2.3.1]: https://github.com/filipek92/iqr23/compare/v2.3.0...v2.3.1
 [2.3.0]: https://github.com/filipek92/iqr23/compare/v2.2.1...v2.3.0

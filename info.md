@@ -5,6 +5,11 @@
 Home Assistant integration for the iQ R23 heating controller made by iQ vytápění. It reads the
 controller's local web interface and lets you monitor and control the heating system from Home Assistant.
 
+> **Disclaimer:** This is an unofficial, community-developed integration. It is not affiliated with,
+> endorsed by or supported by iQ vytápění s.r.o. "iQ vytápění", "iQ R23" and the related logos are
+> trademarks of their respective owners and are used only to identify the supported device.
+> Use at your own risk.
+
 ## Features
 
 - **Temperatures** – outdoor, storage tank, heating circuits TO1/TO2, fireplace, solar, pool and cooling
