@@ -3,6 +3,8 @@
 ## [Unreleased]
 
 ### Added
+- Integration icon and logo (iQ vytápění brand, light and dark variants) shipped in `brand/`,
+  shown in the Home Assistant integration settings from 2026.3.
 - Lovelace card `custom:iqr23-card` bundled with the integration, no separate installation needed:
   outdoor temperature, fault banner, storage tank with heating state, heating circuits with pump,
   demand, setback and mixing valve, fireplace/solar/pool/cooling tiles and -/+ buttons for the tank
